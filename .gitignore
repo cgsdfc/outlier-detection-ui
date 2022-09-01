@@ -1,0 +1,12 @@
+__pycache__/
+.idea/
+.vscode/
+*.pyc
+/export/
+*-checkpoint.ipynb
+/build
+/dist
+/main.spec
+/test_images/tmp
+/bin
+*.html
