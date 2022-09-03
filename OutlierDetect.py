@@ -14,6 +14,7 @@
 from dataclasses import dataclass
 from pprint import pprint
 import logging
+import traceback
 from typing import Any
 from pyod.models.base import BaseDetector
 from pathlib import Path as P
@@ -265,7 +266,8 @@ class RunEvaluator(QThread):
     sig_load_model = pyqtSignal(str)
     sig_predict = pyqtSignal(str)
     sig_fit_model = pyqtSignal(str)
-    sig_visualize = pyqtSignal(str)
+    sig_visualize = pyqtSignal(str, str)
+    sig_error = pyqtSignal(str)
 
     ACTION_LIST = [
         'load_data',
@@ -293,9 +295,17 @@ class RunEvaluator(QThread):
     def run(self) -> None:
         for key in self.ACTION_LIST:
             action = getattr(self.evaluator, key)
-            action()
-            sig = getattr(self, f'sig_{key}')
-            sig.emit(key)
+            try:
+                ret = action()
+            except Exception as e:
+                self.sig_error.emit(str(e))
+                traceback.print_exc()
+            else:
+                sig = getattr(self, f'sig_{key}')
+                if key == 'visualize':
+                    sig.emit(key, str(ret))
+                else:
+                    sig.emit(key)
 
 
 if __name__ == "__main__":
