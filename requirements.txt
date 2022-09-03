@@ -3,3 +3,4 @@ pyqt5-qt5
 pyqt5-tools
 pyqtgraph
 pyod
+tensorflow

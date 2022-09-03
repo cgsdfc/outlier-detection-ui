@@ -71,26 +71,27 @@ class ModelZoo:
         PAT = re.compile(r"\s*\#\s*from pyod\.models\.(\w+) import (\w+)")
         data = self.RAW_TEXT.splitlines()
         data = list(map(lambda x: PAT.match(x).groups(), data))
+        data = list(map(lambda x: tuple(reversed(x)), data))
         self.LOG.info(f"Valid models {data}")
 
         return dict(data)
 
     def __init__(self) -> None:
-        self.model_map = self.discover_models()
+        self.module_map = self.discover_models()
         self.model_cache = {}
 
     def load(self, name: str) -> type:
         """
         Load a model class by its lower-case name.
         """
-        assert name in self.model_map, f"Bad model {name}"
+        assert name in self.module_map, f"Bad model {name}"
         if name in self.model_cache:
             return self.model_cache[name]
 
-        clsname = self.model_map[name]
+        modname = self.module_map[name] # Module name.
         ctx = {}
-        exec(f"from pyod.models.{name} import {clsname}", ctx)
-        modelcls = ctx[clsname]
+        exec(f"from pyod.models.{modname} import {name}", ctx)
+        modelcls = ctx[name]
         self.model_cache[name] = modelcls
         return modelcls
 
@@ -99,7 +100,7 @@ class ModelZoo:
         """
         Return all valid names of models.
         """
-        return list(self.model_map.keys())
+        return list(self.module_map.keys())
 
 
 MODEL_ZOO = ModelZoo()
@@ -259,7 +260,7 @@ if __name__ == "__main__":
     # P("xxxxxxxxxxxxx").unlink()
     evaluator = Evaluator(
         Config(
-            model_name="knn",
+            model_name="AutoEncoder",
             contamination=0.1,
             n_train=200,
             n_test=100,
