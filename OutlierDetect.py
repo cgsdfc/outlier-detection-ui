@@ -17,6 +17,8 @@ import logging
 from typing import Any
 from pyod.models.base import BaseDetector
 from pathlib import Path as P
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QThreadPool, QRunnable, QObject
+from typing import Callable, Dict
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,7 +28,7 @@ KEY_MODEL_NAME = "model_name"
 
 
 @dataclass
-class Config:
+class DetectionConfig:
     """
     配置一次运行的所有参数。
     """
@@ -88,7 +90,7 @@ class ModelZoo:
         if name in self.model_cache:
             return self.model_cache[name]
 
-        modname = self.module_map[name] # Module name.
+        modname = self.module_map[name]  # Module name.
         ctx = {}
         exec(f"from pyod.models.{modname} import {name}", ctx)
         modelcls = ctx[name]
@@ -185,7 +187,7 @@ class DetectionResult:
 
 
 @dataclass
-class Evaluator:
+class DetectionEvaluator:
     """
     主导一次检测的全过程，包括：
     1. 加载数据；
@@ -195,14 +197,14 @@ class Evaluator:
     5. 预测结果可视化；
     """
 
-    config: Config
+    config: DetectionConfig
     model: BaseDetector = None
     data: Data = None
     result: DetectionResult = None
 
     LOG = logging.getLogger("[Evaluator]")
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: DetectionConfig) -> None:
         self.config = config
         self.LOG.info(f"init with config {config}")
 
@@ -256,19 +258,45 @@ class Evaluator:
         return image
 
 
-if __name__ == "__main__":
-    # P("xxxxxxxxxxxxx").unlink()
-    evaluator = Evaluator(
-        Config(
-            model_name="AutoEncoder",
-            contamination=0.1,
-            n_train=200,
-            n_test=100,
-        )
-    )
-    evaluator.load_data()
-    evaluator.load_model()
-    evaluator.fit_model()
-    evaluator.predict()
-    evaluator.visualize()
+class RunEvaluator(QThread):
+    LOG = logging.getLogger("[RunEvaluator]")
 
+    sig_load_data = pyqtSignal(str)
+    sig_load_model = pyqtSignal(str)
+    sig_predict = pyqtSignal(str)
+    sig_fit_model = pyqtSignal(str)
+    sig_visualize = pyqtSignal(str)
+
+    ACTION_LIST = [
+        'load_data',
+        'load_model',
+        'fit_model',
+        'predict',
+        'visualize',
+    ]
+
+    def __init__(
+        self,
+        parent,
+        config: DetectionConfig,
+        slot_dict: Dict[str, Callable],
+    ):
+        super().__init__(parent)
+        self.evaluator = DetectionEvaluator(config)
+        for key in self.ACTION_LIST:
+            if key in slot_dict:
+                sig = getattr(self, f'sig_{key}')
+                slot = slot_dict[key]
+                sig.connect(slot)
+                self.LOG.info(f'Connect sig-slot {key}')
+
+    def run(self) -> None:
+        for key in self.ACTION_LIST:
+            action = getattr(self.evaluator, key)
+            action()
+            sig = getattr(self, f'sig_{key}')
+            sig.emit(key)
+
+
+if __name__ == "__main__":
+    pass

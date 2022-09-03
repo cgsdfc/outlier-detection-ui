@@ -4,7 +4,7 @@
 
 from UserInterface import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QThreadPool, QRunnable, QObject
 from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import (
     QMessageBox,
@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import (
     QProgressBar,
     QCheckBox,
 )
+from OutlierDetect import RunEvaluator, DetectionConfig
 
 
 class MyWindow(QtWidgets.QMainWindow):
@@ -23,12 +24,28 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-    # 槽函数的命名：on_ObjectName_SignalName
+        # self.thread_pool = QThreadPool(self)
+        # self.thread_pool.setMaxThreadCount(4)
+
+    @pyqtSlot(str)
+    def default_slot(self, msg: str):
+        print(f'XXXXXXXXXXXXXXXX {msg}')
+
     @pyqtSlot()
     def on_pbDemo_clicked(self):
-        QMessageBox.information(
-            self, "欢迎来到PyQt", "121212212", QMessageBox.StandardButton.Yes
+        job = RunEvaluator(
+            parent=self,
+            config=DetectionConfig(
+                model_name="KNN",
+                contamination=0.1,
+                n_train=200,
+                n_test=100,
+            ),
+            slot_dict={
+                key: self.default_slot for key in RunEvaluator.ACTION_LIST}
         )
+        # self.thread_pool.start(job)
+        job.start()
 
 
 if __name__ == "__main__":
