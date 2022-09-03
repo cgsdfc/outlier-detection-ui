@@ -15,6 +15,8 @@ from distutils.command.config import config
 from pprint import pprint
 import logging
 from typing import Any
+
+# from numpy import ndarray
 logging.basicConfig(level=logging.INFO)
 
 
@@ -23,6 +25,7 @@ class Config:
     """
     配置一次运行的所有参数。
     """
+
     model_name: str
     contamination: float
     n_train: int
@@ -31,7 +34,7 @@ class Config:
 
 
 class ModelZoo:
-    LOG=logging.getLogger('[Model]')
+    LOG = logging.getLogger("[Model]")
 
     RAW_TEXT = """\
     #     from pyod.models.abod import ABOD
@@ -50,10 +53,10 @@ class ModelZoo:
     def discover_models(self):
         import re
 
-        PAT=re.compile(r'\s*\#\s*from pyod\.models\.(\w+) import (\w+)')
-        data=self.RAW_TEXT.splitlines()
-        data=list(map(lambda x: PAT.match(x).groups(), data))
-        self.LOG.info(f'valid models {data}')
+        PAT = re.compile(r"\s*\#\s*from pyod\.models\.(\w+) import (\w+)")
+        data = self.RAW_TEXT.splitlines()
+        data = list(map(lambda x: PAT.match(x).groups(), data))
+        self.LOG.info(f"valid models {data}")
 
         return dict(data)
 
@@ -65,13 +68,13 @@ class ModelZoo:
         """
         Load a model class by its lower-case name.
         """
-        assert name in self.model_map, f'Bad model {name}'
+        assert name in self.model_map, f"Bad model {name}"
         if name in self.model_cache:
             return self.model_cache[name]
 
         clsname = self.model_map[name]
         ctx = {}
-        exec(f'from pyod.models.{name} import {clsname}', ctx)
+        exec(f"from pyod.models.{name} import {clsname}", ctx)
         modelcls = ctx[clsname]
         self.model_cache[name] = modelcls
         return modelcls
@@ -82,41 +85,79 @@ class ModelZoo:
         Return all valid names of models.
         """
         return list(self.model_map.keys())
-    
+
 
 MODEL_ZOO = ModelZoo()
+
 
 @dataclass
 class Data:
 
-    X_train=None
-    X_test=None
-    y_train=None
-    y_test=None
-    config=None
-    
-    @classmethod    
-    def load(self,contamination=0.1,n_train=200,n_test=100):
+    X_train = None
+    X_test = None
+    y_train = None
+    y_test = None
+    config = None
+
+    @classmethod
+    def load(self, contamination=0.1, n_train=200, n_test=100):
         config = locals().copy()
-        config.pop('self')
+        config.pop("self")
         from pyod.utils.data import generate_data
+
         d = Data()
         d.config = config
         d.X_train, d.X_test, d.y_train, d.y_test = generate_data(
-            n_train=n_train, n_test=n_test, contamination=contamination)
+            n_train=n_train, n_test=n_test, contamination=contamination
+        )
         return d
 
     def __repr__(self) -> str:
-        return f'Data(config={self.config})'
+        return f"Data(config={self.config})"
+
+
+@dataclass
+class DetectionResult:
+    # get the prediction labels and outlier scores of the training data
+    y_train_pred = None  # binary labels (0: inliers, 1: outliers)
+    y_train_scores = None  # raw outlier scores
+
+    # get the prediction on the test data
+    y_test_pred = None  # outlier labels (0 or 1)
+    y_test_scores = None  # outlier scores
+
+    def visualize(self, clf_name: str, data: Data):
+        from pyod.utils.example import visualize as visualize
+        from multiprocessing import Process
+
+        visualize(
+            clf_name,
+            show_figure=False,
+            save_figure=True,
+            X_train=data.X_train,
+            X_test=data.X_test,
+            y_test=data.y_test,
+            y_train_pred=self.y_train_pred,
+            y_test_pred=self.y_test_pred,
+        )
+
+    # def from_model(self, clf):
+    #     # get the prediction labels and outlier scores of the training data
+    #     y_train_pred = clf.labels_  # binary labels (0: inliers, 1: outliers)
+    #     y_train_scores = clf.decision_scores_  # raw outlier scores
+
+    #     # get the prediction on the test data
+    #     y_test_pred = clf.predict(X_test)  # outlier labels (0 or 1)
+    #     y_test_scores = clf.decision_function(X_test)  # outlier scores
 
 
 @dataclass
 class Evaluator:
     config: Config
-    model: 'BaseDetector'
+    model: "BaseDetector"
     data: Data
 
-    LOG=logging.getLogger('[Evaluator]')
+    LOG = logging.getLogger("[Evaluator]")
 
     def __init__(self, config: Config) -> None:
 
@@ -125,19 +166,22 @@ class Evaluator:
 
         from pyod.models.base import BaseDetector
 
-        self.model: BaseDetector = modelcls(contamination=config.contamination,
-            **config.model_config)
-        self.LOG.info(f'Model instance created: {self.model}')
-            
+        self.model: BaseDetector = modelcls(
+            contamination=config.contamination, **config.model_config
+        )
+        self.LOG.info(f"Model instance created: {self.model}")
+
         self.data = Data.load(
             contamination=config.contamination,
             n_train=config.n_train,
             n_test=config.n_test,
         )
-        # self.LOG.info(f'Data loaded: {')
-        
+        self.LOG.info(f"Data loaded: {self.data}")
 
-if __name__=='__main__':
-    d=Data.load()
+    def run(self):
+        pass
+
+
+if __name__ == "__main__":
+    d = Data.load()
     print(d)
-    

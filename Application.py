@@ -13,8 +13,9 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QLabel,
     QProgressBar,
-    QCheckBox
-) 
+    QCheckBox,
+)
+
 
 class MyWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -25,9 +26,11 @@ class MyWindow(QtWidgets.QMainWindow):
     # 槽函数的命名：on_ObjectName_SignalName
     @pyqtSlot()
     def on_pbDemo_clicked(self):
-        QMessageBox.information(self, "欢迎来到PyQt", "121212212", QMessageBox.StandardButton.Yes)
-    
-    
+        QMessageBox.information(
+            self, "欢迎来到PyQt", "121212212", QMessageBox.StandardButton.Yes
+        )
+
+
 if __name__ == "__main__":
     import sys
 
