@@ -24,8 +24,6 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        # self.thread_pool = QThreadPool(self)
-        # self.thread_pool.setMaxThreadCount(4)
 
     @pyqtSlot(str)
     def default_slot(self, msg: str):
@@ -44,7 +42,6 @@ class MyWindow(QtWidgets.QMainWindow):
             slot_dict={
                 key: self.default_slot for key in RunEvaluator.ACTION_LIST}
         )
-        # self.thread_pool.start(job)
         job.start()
 
 
