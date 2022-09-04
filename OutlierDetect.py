@@ -16,7 +16,12 @@ from pprint import pprint
 import logging
 import traceback
 from typing import Any
-from pyod.models.base import BaseDetector
+
+if False:
+    from pyod.models.base import BaseDetector
+else:
+    BaseDetector = Any
+
 from pathlib import Path as P
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QThreadPool, QRunnable, QObject
 from typing import Callable, Dict

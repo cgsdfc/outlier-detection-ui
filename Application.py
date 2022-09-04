@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
     QProgressBar,
     QCheckBox,
 )
-from OutlierDetect import RunEvaluator, DetectionConfig
+from OutlierDetect import RunEvaluator, DetectionConfig, MODEL_ZOO
 
 
 class MyWindow(QtWidgets.QMainWindow):
@@ -24,25 +24,27 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        self.ui.cbModelName.addItems(MODEL_ZOO.model_list)
 
-    @pyqtSlot(str)
-    def default_slot(self, msg: str):
-        print(f'XXXXXXXXXXXXXXXX {msg}')
+    # @pyqtSlot(str)
+    # def default_slot(self, msg: str):
+    #     print(f'XXXXXXXXXXXXXXXX {msg}')
 
     @pyqtSlot()
-    def on_pbDemo_clicked(self):
-        job = RunEvaluator(
-            parent=self,
-            config=DetectionConfig(
-                model_name="KNN",
-                contamination=0.1,
-                n_train=200,
-                n_test=100,
-            ),
-            slot_dict={
-                key: self.default_slot for key in RunEvaluator.ACTION_LIST}
-        )
-        job.start()
+    def on_pbRunDetect(self):
+        pass
+        # job = RunEvaluator(
+        #     parent=self,
+        #     config=DetectionConfig(
+        #         model_name="KNN",
+        #         contamination=0.1,
+        #         n_train=200,
+        #         n_test=100,
+        #     ),
+        #     slot_dict={
+        #         key: self.default_slot for key in RunEvaluator.ACTION_LIST}
+        # )
+        # job.start()
 
 
 if __name__ == "__main__":

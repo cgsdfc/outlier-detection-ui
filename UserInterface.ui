@@ -1363,7 +1363,7 @@ QMenuBar QToolButton {
               <item row="1" column="1">
                <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,3">
                 <item row="1" column="0">
-                 <widget class="QComboBox" name="cb_modelName"/>
+                 <widget class="QComboBox" name="cbModelName"/>
                 </item>
                 <item row="0" column="0">
                  <widget class="QLabel" name="label">
@@ -1392,7 +1392,7 @@ QMenuBar QToolButton {
                  </spacer>
                 </item>
                 <item row="1" column="4">
-                 <widget class="QComboBox" name="cb_numTest"/>
+                 <widget class="QComboBox" name="cbNumTest"/>
                 </item>
                 <item row="0" column="6">
                  <widget class="QLabel" name="label_4">
@@ -1415,10 +1415,10 @@ QMenuBar QToolButton {
                  </widget>
                 </item>
                 <item row="1" column="6">
-                 <widget class="QComboBox" name="cb_ratio"/>
+                 <widget class="QComboBox" name="cbRatio"/>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QComboBox" name="cb_numTrain"/>
+                 <widget class="QComboBox" name="cbNumTrain"/>
                 </item>
                 <item row="0" column="4">
                  <widget class="QLabel" name="label_3">
@@ -1605,7 +1605,7 @@ QMenuBar QToolButton {
             </spacer>
            </item>
            <item>
-            <widget class="QProgressBar" name="pgb_evaluator">
+            <widget class="QProgressBar" name="pgbEvaluator">
              <property name="value">
               <number>24</number>
              </property>
@@ -1625,7 +1625,7 @@ QMenuBar QToolButton {
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="pb_runDetect">
+            <widget class="QPushButton" name="pbRunDetect">
              <property name="text">
               <string>检测</string>
              </property>
