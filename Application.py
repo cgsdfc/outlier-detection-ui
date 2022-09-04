@@ -34,6 +34,7 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.leNumTrain.setValidator(QIntValidator(1, 1000, self))
         self.ui.leNumTest.setValidator(QIntValidator(0, 500, self))
         self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
+        self.ui.lbProgress.setText('就绪')
         
         self.ui.leNumTrain.setText('200')
         self.ui.leNumTrain.editingFinished.emit()
@@ -82,6 +83,8 @@ class MyWindow(QtWidgets.QMainWindow):
         pgb = self.ui.pgbEvaluator
         pgb.reset()
         pgb.setRange(0, len(RunEvaluator.ACTION_LIST)-1)
+        self.ui.lbProgress.setText('检测中')
+
         job = RunEvaluator(
             parent=self,
             config=self.detection_config,
@@ -101,11 +104,11 @@ class MyWindow(QtWidgets.QMainWindow):
 
         def on_visualize(tag: str, image: str):
             on_progress(tag)
-            LOG.info(f'Visualize {image}, tag {tag}')
             label = self.ui.lbImage
             image = QtGui.QPixmap(image).scaled(label.width(), label.height())
             assert not image.isNull()
             label.setPixmap(image)
+            LOG.info(f'Label on {image}, tag {tag}')
 
         def on_error(tag: str, msg: str):
             LOG.info(f'Error {msg}, tag {tag}')
@@ -116,6 +119,7 @@ class MyWindow(QtWidgets.QMainWindow):
         def on_progress(tag: str):
             assert tag in self.ACTION_TO_PROGRESS
             text = self.ACTION_TO_PROGRESS[tag]
+            self.ui.lbProgress.setText(text)
             LOG.info(f'Progress {tag} => {text}')
             pgb = self.ui.pgbEvaluator
             val_pgb = RunEvaluator.ACTION_LIST.index(tag)

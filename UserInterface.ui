@@ -1537,8 +1537,8 @@ QMenuBar QToolButton {
         <property name="title">
          <string>检测结果</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_6">
-         <item row="0" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
           <spacer name="horizontalSpacer_7">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -1548,13 +1548,13 @@ QMenuBar QToolButton {
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
-             <height>20</height>
+             <width>37</width>
+             <height>17</height>
             </size>
            </property>
           </spacer>
          </item>
-         <item row="0" column="1">
+         <item>
           <widget class="QFrame" name="frame_2">
            <property name="frameShape">
             <enum>QFrame::StyledPanel</enum>
@@ -1566,14 +1566,17 @@ QMenuBar QToolButton {
             <item row="0" column="0">
              <widget class="QLabel" name="lbImage">
               <property name="text">
-               <string/>
+               <string>1111</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
            </layout>
           </widget>
          </item>
-         <item row="0" column="2">
+         <item>
           <spacer name="horizontalSpacer_8">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -1583,8 +1586,8 @@ QMenuBar QToolButton {
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
-             <height>20</height>
+             <width>37</width>
+             <height>17</height>
             </size>
            </property>
           </spacer>
@@ -1602,11 +1605,14 @@ QMenuBar QToolButton {
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,4,0,1,0">
+          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0,0,4,0,1,0">
            <item>
-            <spacer name="horizontalSpacer_2">
+            <spacer name="horizontalSpacer_11">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -1615,6 +1621,54 @@ QMenuBar QToolButton {
               </size>
              </property>
             </spacer>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame_4">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_8">
+              <item row="0" column="0">
+               <widget class="QLabel" name="lbProgress">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame_5">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QProgressBar" name="pgbEvaluator">
