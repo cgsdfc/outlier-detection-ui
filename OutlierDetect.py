@@ -30,7 +30,7 @@ logging.basicConfig(level=logging.INFO)
 
 PROJ_DIR = P(__file__).parent
 TMP_DIR = PROJ_DIR.joinpath("tmp")
-KEY_MODEL_NAME = "model_name"
+TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @dataclass

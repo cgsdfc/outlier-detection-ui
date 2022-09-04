@@ -4,7 +4,7 @@
 
 from UserInterface import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import (
     QMessageBox,
     QFileDialog,
@@ -35,6 +35,7 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.leNumTest.setValidator(QIntValidator(0, 500, self))
         self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
         self.ui.lbProgress.setText('就绪')
+        self.ui.lbImage.setScaledContents(True)
         
         self.ui.leNumTrain.setText('200')
         self.ui.leNumTrain.editingFinished.emit()
