@@ -1361,7 +1361,7 @@ QMenuBar QToolButton {
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
               <item row="1" column="1">
-               <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,3">
+               <layout class="QGridLayout" name="gridLayout_4" rowstretch="1,1">
                 <item row="1" column="0">
                  <widget class="QComboBox" name="cbModelName"/>
                 </item>
@@ -1391,9 +1391,6 @@ QMenuBar QToolButton {
                   </property>
                  </spacer>
                 </item>
-                <item row="1" column="4">
-                 <widget class="QComboBox" name="cbNumTest"/>
-                </item>
                 <item row="0" column="6">
                  <widget class="QLabel" name="label_4">
                   <property name="text">
@@ -1413,12 +1410,6 @@ QMenuBar QToolButton {
                    <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
-                </item>
-                <item row="1" column="6">
-                 <widget class="QComboBox" name="cbRatio"/>
-                </item>
-                <item row="1" column="2">
-                 <widget class="QComboBox" name="cbNumTrain"/>
                 </item>
                 <item row="0" column="4">
                  <widget class="QLabel" name="label_3">
@@ -1461,6 +1452,15 @@ QMenuBar QToolButton {
                    </size>
                   </property>
                  </spacer>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLineEdit" name="leNumTrain"/>
+                </item>
+                <item row="1" column="4">
+                 <widget class="QLineEdit" name="leNumTest"/>
+                </item>
+                <item row="1" column="6">
+                 <widget class="QLineEdit" name="leOutlierRate"/>
                 </item>
                </layout>
               </item>

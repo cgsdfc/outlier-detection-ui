@@ -4,8 +4,7 @@
 
 from UserInterface import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QThreadPool, QRunnable, QObject
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import (
     QMessageBox,
     QFileDialog,
@@ -16,6 +15,9 @@ from PyQt5.QtWidgets import (
     QCheckBox,
 )
 from OutlierDetect import RunEvaluator, DetectionConfig, MODEL_ZOO
+import logging
+logging.basicConfig(level=logging.INFO)
+LOG = logging.getLogger("[Application]")
 
 
 class MyWindow(QtWidgets.QMainWindow):
@@ -25,14 +27,27 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
 
         self.ui.cbModelName.addItems(MODEL_ZOO.model_list)
+        self.ui.pgbEvaluator.reset()
 
-    # @pyqtSlot(str)
-    # def default_slot(self, msg: str):
-    #     print(f'XXXXXXXXXXXXXXXX {msg}')
+    @pyqtSlot(str)
+    def on_cbModelName_currentTextChanged(self, value: str):
+        LOG.info(f'cbModelName: {value}')
+
+    @pyqtSlot(str)
+    def on_leNumTrain_textChanged(self, value: str):
+        LOG.info(f'leNumTrain: {value}')
+
+    @pyqtSlot(str)
+    def on_leNumTest_textChanged(self, value: str):
+        LOG.info(f'leNumTest: {value}')
+
+    @pyqtSlot(str)
+    def on_leOutlierRate_textChanged(self, value: str):
+        LOG.info(f'leOutlierRate: {value}')
 
     @pyqtSlot()
-    def on_pbRunDetect(self):
-        pass
+    def on_pbRunDetect_clicked(self):
+        LOG.info(f'pbRunDetect clicked')
         # job = RunEvaluator(
         #     parent=self,
         #     config=DetectionConfig(

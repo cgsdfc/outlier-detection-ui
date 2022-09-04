@@ -23,7 +23,7 @@ else:
     BaseDetector = Any
 
 from pathlib import Path as P
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QThreadPool, QRunnable, QObject
+from PyQt5.QtCore import QThread, pyqtSignal
 from typing import Callable, Dict
 
 logging.basicConfig(level=logging.INFO)
