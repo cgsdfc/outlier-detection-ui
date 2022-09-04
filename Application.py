@@ -81,7 +81,7 @@ class MyWindow(QtWidgets.QMainWindow):
         LOG.info(f'pbRunDetect clicked')
         pgb = self.ui.pgbEvaluator
         pgb.reset()
-        pgb.setRange(0, len(RunEvaluator.ACTION_LIST))
+        pgb.setRange(0, len(RunEvaluator.ACTION_LIST)-1)
         job = RunEvaluator(
             parent=self,
             config=self.detection_config,
