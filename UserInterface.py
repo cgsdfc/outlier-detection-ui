@@ -1454,6 +1454,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addLayout(self.horizontalLayout_2, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.frame_3)
         self.verticalLayout.setStretch(0, 1)
+        self.verticalLayout.setStretch(1, 8)
         self.verticalLayout.setStretch(2, 1)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)

@@ -1326,7 +1326,7 @@ QMenuBar QToolButton {
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,8,1">
       <item>
        <widget class="QGroupBox" name="groupBox_2">
         <property name="title">
