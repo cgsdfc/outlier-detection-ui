@@ -1454,13 +1454,25 @@ QMenuBar QToolButton {
                  </spacer>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QLineEdit" name="leNumTrain"/>
+                 <widget class="QLineEdit" name="leNumTrain">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
                 </item>
                 <item row="1" column="4">
-                 <widget class="QLineEdit" name="leNumTest"/>
+                 <widget class="QLineEdit" name="leNumTest">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
                 </item>
                 <item row="1" column="6">
-                 <widget class="QLineEdit" name="leOutlierRate"/>
+                 <widget class="QLineEdit" name="leOutlierRate">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -1552,7 +1564,7 @@ QMenuBar QToolButton {
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
             <item row="0" column="0">
-             <widget class="QLabel" name="lb_image">
+             <widget class="QLabel" name="lbImage">
               <property name="text">
                <string/>
               </property>

@@ -29,11 +29,20 @@ class MyWindow(QtWidgets.QMainWindow):
         self.detection_config = DetectionConfig()
 
         self.ui.cbModelName.addItems(MODEL_ZOO.model_list)
-        self.ui.cbModelName.setCurrentIndex(-1)
+        self.ui.cbModelName.setCurrentText('KNN')
         self.ui.pgbEvaluator.reset()
         self.ui.leNumTrain.setValidator(QIntValidator(1, 1000, self))
         self.ui.leNumTest.setValidator(QIntValidator(0, 500, self))
         self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
+        
+        self.ui.leNumTrain.setText('200')
+        self.ui.leNumTrain.editingFinished.emit()
+
+        self.ui.leNumTest.setText('100')
+        self.ui.leNumTest.editingFinished.emit()
+        
+        self.ui.leOutlierRate.setText('0.1')
+        self.ui.leOutlierRate.editingFinished.emit()
 
     @pyqtSlot(str)
     def on_cbModelName_currentTextChanged(self, value: str):
@@ -91,8 +100,9 @@ class MyWindow(QtWidgets.QMainWindow):
     def build_slot_dict(self):
 
         def on_visualize(tag: str, image: str):
+            on_progress(tag)
             LOG.info(f'Visualize {image}, tag {tag}')
-            label = self.ui.lb_image
+            label = self.ui.lbImage
             image = QtGui.QPixmap(image).scaled(label.width(), label.height())
             assert not image.isNull()
             label.setPixmap(image)
