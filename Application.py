@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
     QProgressBar,
     QCheckBox,
 )
+from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from OutlierDetect import RunEvaluator, DetectionConfig, MODEL_ZOO
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -25,25 +26,43 @@ class MyWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.detection_config = DetectionConfig()
 
         self.ui.cbModelName.addItems(MODEL_ZOO.model_list)
         self.ui.pgbEvaluator.reset()
+        # self.ui.leNumTrain.setValidator(QIntValidator(1, 1000, self))
+        # self.ui.leNumTest.setValidator(QIntValidator(0, 500, self))
+        # self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
 
     @pyqtSlot(str)
     def on_cbModelName_currentTextChanged(self, value: str):
         LOG.info(f'cbModelName: {value}')
+        self.detection_config.model_name = value
 
-    @pyqtSlot(str)
-    def on_leNumTrain_textChanged(self, value: str):
+    @pyqtSlot()
+    def on_leNumTrain_editingFinished(self):
+        value = self.ui.leNumTrain.text()
         LOG.info(f'leNumTrain: {value}')
+        try:
+            self.detection_config.n_train = int(value)
+        except ValueError:
+            pass
 
-    @pyqtSlot(str)
-    def on_leNumTest_textChanged(self, value: str):
+
+    @pyqtSlot()
+    def on_leNumTest_editingFinished(self):
+        value = self.ui.leNumTest.text()
         LOG.info(f'leNumTest: {value}')
+        try:
+            self.detection_config.n_test = int(value)
+        except ValueError:
+            pass
 
-    @pyqtSlot(str)
-    def on_leOutlierRate_textChanged(self, value: str):
+    @pyqtSlot()
+    def on_leOutlierRate_editingFinished(self):
+        value = self.ui.leOutlierRate.text()
         LOG.info(f'leOutlierRate: {value}')
+        self.detection_config.contamination = float(value)
 
     @pyqtSlot()
     def on_pbRunDetect_clicked(self):

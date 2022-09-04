@@ -40,13 +40,13 @@ class DetectionConfig:
     """
 
     # 模型的名字，比如 ABOD
-    model_name: str
+    model_name: str = None
     # outlier 所占的比例
-    contamination: float
+    contamination: float = None
     # 训练样本的数量
-    n_train: int
+    n_train: int = None
     # 测试样本的数量
-    n_test: int
+    n_test: int = None
     # 传给模型构造器的额外参数
     model_config: dict = None
 
