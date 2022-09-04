@@ -272,8 +272,9 @@ class RunEvaluator(QThread):
     sig_predict = pyqtSignal(str)
     sig_fit_model = pyqtSignal(str)
     sig_visualize = pyqtSignal(str, str)
-    sig_error = pyqtSignal(str)
+    sig_error = pyqtSignal(str, str)
 
+    # error not in here!!
     ACTION_LIST = [
         'load_data',
         'load_model',
@@ -290,12 +291,13 @@ class RunEvaluator(QThread):
     ):
         super().__init__(parent)
         self.evaluator = DetectionEvaluator(config)
-        for key in self.ACTION_LIST:
-            if key in slot_dict:
+        for key, slot in slot_dict.items():
+            try:
                 sig = getattr(self, f'sig_{key}')
-                slot = slot_dict[key]
-                sig.connect(slot)
-                self.LOG.info(f'Connect sig-slot {key}')
+            except AttributeError:
+                continue
+            sig.connect(slot)
+            self.LOG.info(f'Connect sig-slot {key}')
 
     def run(self) -> None:
         for key in self.ACTION_LIST:
@@ -303,8 +305,10 @@ class RunEvaluator(QThread):
             try:
                 ret = action()
             except Exception as e:
-                self.sig_error.emit(str(e))
+                self.sig_error.emit('error', str(e))
                 traceback.print_exc()
+                self.LOG.warning(f'Error in action {key}')
+                return
             else:
                 sig = getattr(self, f'sig_{key}')
                 if key == 'visualize':

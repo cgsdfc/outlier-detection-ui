@@ -1,1 +1,1 @@
-pyqt5-tools.exe designer
+pyqt5-tools.exe designer ./UserInterface.ui

@@ -29,10 +29,11 @@ class MyWindow(QtWidgets.QMainWindow):
         self.detection_config = DetectionConfig()
 
         self.ui.cbModelName.addItems(MODEL_ZOO.model_list)
+        self.ui.cbModelName.setCurrentIndex(-1)
         self.ui.pgbEvaluator.reset()
-        # self.ui.leNumTrain.setValidator(QIntValidator(1, 1000, self))
-        # self.ui.leNumTest.setValidator(QIntValidator(0, 500, self))
-        # self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
+        self.ui.leNumTrain.setValidator(QIntValidator(1, 1000, self))
+        self.ui.leNumTest.setValidator(QIntValidator(0, 500, self))
+        self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
 
     @pyqtSlot(str)
     def on_cbModelName_currentTextChanged(self, value: str):
@@ -48,7 +49,6 @@ class MyWindow(QtWidgets.QMainWindow):
         except ValueError:
             pass
 
-
     @pyqtSlot()
     def on_leNumTest_editingFinished(self):
         value = self.ui.leNumTest.text()
@@ -62,23 +62,59 @@ class MyWindow(QtWidgets.QMainWindow):
     def on_leOutlierRate_editingFinished(self):
         value = self.ui.leOutlierRate.text()
         LOG.info(f'leOutlierRate: {value}')
-        self.detection_config.contamination = float(value)
+        try:
+            self.detection_config.contamination = float(value)
+        except ValueError:
+            pass
 
     @pyqtSlot()
     def on_pbRunDetect_clicked(self):
         LOG.info(f'pbRunDetect clicked')
-        # job = RunEvaluator(
-        #     parent=self,
-        #     config=DetectionConfig(
-        #         model_name="KNN",
-        #         contamination=0.1,
-        #         n_train=200,
-        #         n_test=100,
-        #     ),
-        #     slot_dict={
-        #         key: self.default_slot for key in RunEvaluator.ACTION_LIST}
-        # )
-        # job.start()
+        pgb = self.ui.pgbEvaluator
+        pgb.reset()
+        pgb.setRange(0, len(RunEvaluator.ACTION_LIST))
+        job = RunEvaluator(
+            parent=self,
+            config=self.detection_config,
+            slot_dict=self.build_slot_dict(),
+        )
+        job.start()
+
+    ACTION_TO_PROGRESS = dict(
+        load_data='数据加载完成',
+        load_model='模型加载完成',
+        fit_model='模型训练完成',
+        predict='模型预测完成',
+        visualize='可视化完成',
+    )
+
+    def build_slot_dict(self):
+
+        def on_visualize(tag: str, image: str):
+            LOG.info(f'Visualize {image}, tag {tag}')
+            label = self.ui.lb_image
+            image = QtGui.QPixmap(image).scaled(label.width(), label.height())
+            assert not image.isNull()
+            label.setPixmap(image)
+
+        def on_error(tag: str, msg: str):
+            LOG.info(f'Error {msg}, tag {tag}')
+            QMessageBox.warning(
+                self, '错误', msg, QMessageBox.StandardButton.Yes,
+                QMessageBox.StandardButton.Yes)
+
+        def on_progress(tag: str):
+            assert tag in self.ACTION_TO_PROGRESS
+            text = self.ACTION_TO_PROGRESS[tag]
+            LOG.info(f'Progress {tag} => {text}')
+            pgb = self.ui.pgbEvaluator
+            val_pgb = RunEvaluator.ACTION_LIST.index(tag)
+            assert val_pgb != -1
+            pgb.setValue(val_pgb)
+
+        slot_dict = {tag: on_progress for tag in RunEvaluator.ACTION_LIST}
+        slot_dict.update(visualize=on_visualize, error=on_error)
+        return slot_dict
 
 
 if __name__ == "__main__":
