@@ -4,3 +4,4 @@ pyqt5-tools
 pyqtgraph
 pyod
 tensorflow
+pyinstaller

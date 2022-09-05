@@ -5,5 +5,5 @@ __pycache__/
 *-checkpoint.ipynb
 /build
 /dist
-/main.spec
+/*.spec
 /tmp/
