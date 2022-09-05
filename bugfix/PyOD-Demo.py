@@ -1,3 +1,0 @@
-import pyod
-
-help(pyod)
