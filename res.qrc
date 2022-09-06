@@ -1,6 +1,5 @@
 <RCC>
   <qresource prefix="image">
     <file>splash.png</file>
-    <file>Desert.jpg</file>
   </qresource>
 </RCC>
