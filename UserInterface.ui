@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>884</width>
-    <height>749</height>
+    <width>734</width>
+    <height>717</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1326,7 +1326,10 @@ QMenuBar QToolButton {
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,8,1">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,6,6,1">
+      <property name="spacing">
+       <number>3</number>
+      </property>
       <item>
        <widget class="QGroupBox" name="groupBox_2">
         <property name="title">
@@ -1376,7 +1379,7 @@ QMenuBar QToolButton {
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
-              <item row="1" column="1">
+              <item row="0" column="1">
                <layout class="QGridLayout" name="gridLayout_4" rowstretch="1,1">
                 <item row="0" column="4">
                  <widget class="QLabel" name="label_3">
@@ -1521,42 +1524,38 @@ QMenuBar QToolButton {
                 </item>
                </layout>
               </item>
-              <item row="2" column="1">
-               <spacer name="verticalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1">
-               <spacer name="verticalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
              </layout>
             </widget>
            </item>
           </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="title">
+         <string>数据集</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_6">
+         <item row="0" column="0">
+          <widget class="QLabel" name="lbData">
+           <property name="maximumSize">
+            <size>
+             <width>1030</width>
+             <height>699</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -1577,9 +1576,6 @@ QMenuBar QToolButton {
            </property>
            <property name="text">
             <string/>
-           </property>
-           <property name="pixmap">
-            <pixmap resource="res.qrc">:/image/splash.png</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>
