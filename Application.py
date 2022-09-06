@@ -46,6 +46,9 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.leOutlierRate.setText('0.1')
         self.ui.leOutlierRate.editingFinished.emit()
 
+        self.ui.leNumFeas.setText('100')
+        self.ui.leNumFeas.editingFinished.emit()
+
     @pyqtSlot(str)
     def on_cbModelName_currentTextChanged(self, value: str):
         LOG.info(f'cbModelName: {value}')
@@ -75,6 +78,15 @@ class MyWindow(QtWidgets.QMainWindow):
         LOG.info(f'leOutlierRate: {value}')
         try:
             self.detection_config.contamination = float(value)
+        except ValueError:
+            pass
+
+    @pyqtSlot()
+    def on_leNumFeas_editingFinished(self):
+        value = self.ui.leNumFeas.text()
+        LOG.info(f'leNumFeas: {value}')
+        try:
+            self.detection_config.n_features = int(value)
         except ValueError:
             pass
 

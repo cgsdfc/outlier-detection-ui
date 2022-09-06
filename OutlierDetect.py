@@ -47,6 +47,8 @@ class DetectionConfig:
     n_train: int = None
     # 测试样本的数量
     n_test: int = None
+    # 特征维度
+    n_features: int = None
     # 传给模型构造器的额外参数
     model_config: dict = None
 
@@ -133,11 +135,15 @@ class Data:
     X_test = None
     y_train = None
     y_test = None
+
+    X_train2d = None
+    X_test2d = None
+
     # 保存load传入的参数。
     config: dict = None
 
     @classmethod
-    def load(self, contamination=0.1, n_train=200, n_test=100):
+    def load(self, contamination=0.1, n_train=200, n_test=100, n_features=100):
         """
         加载数据集。
 
@@ -157,8 +163,13 @@ class Data:
         d = Data()
         d.config = config
         d.X_train, d.X_test, d.y_train, d.y_test = generate_data(
-            n_train=n_train, n_test=n_test, contamination=contamination
+            n_train=n_train, n_test=n_test, contamination=contamination,
+            n_features=n_features,
         )
+        from sklearn.manifold import TSNE
+        d.X_train2d = TSNE().fit_transform(d.X_train)
+        d.X_test2d = TSNE().fit_transform(d.X_test)
+
         return d
 
     def __repr__(self) -> str:
@@ -201,9 +212,9 @@ class DetectionResult:
             clf_name,
             show_figure=False,
             save_figure=True,
-            X_train=data.X_train,
+            X_train=data.X_train2d,
             y_train=data.y_train,
-            X_test=data.X_test,
+            X_test=data.X_test2d,
             y_test=data.y_test,
             y_train_pred=self.y_train_pred,
             y_test_pred=self.y_test_pred,
@@ -255,6 +266,7 @@ class DetectionEvaluator:
             contamination=config.contamination,
             n_train=config.n_train,
             n_test=config.n_test,
+            n_features=config.n_features,
         )
         self.LOG.info(f"Data loaded: {self.data}")
 
