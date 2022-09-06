@@ -73,7 +73,12 @@ class ModelZoo:
     """
 
     @classmethod
-    def discover_models(self):
+    def discover_models(self) -> Dict[str, str]:
+        """Load a list of available models.
+
+        :return: a dict from class name to module name.
+        :rtype: Dict[str, str]
+        """
         import re
 
         PAT = re.compile(r"\s*\#\s*from pyod\.models\.(\w+) import (\w+)")
@@ -89,8 +94,12 @@ class ModelZoo:
         self.model_cache = {}
 
     def load(self, name: str) -> type:
-        """
-        Load a model class by its lower-case name.
+        """Load a model class by its namae
+
+        :param name: the class name of the model.
+        :type name: str
+        :return: the type object.
+        :rtype: type
         """
         assert name in self.module_map, f"Bad model {name}"
         if name in self.model_cache:
@@ -129,6 +138,18 @@ class Data:
 
     @classmethod
     def load(self, contamination=0.1, n_train=200, n_test=100):
+        """
+        加载数据集。
+
+        :param contamination: _description_, defaults to 0.1
+        :type contamination: _type_, optional
+        :param n_train: _description_, defaults to 200
+        :type n_train: _type_, optional
+        :param n_test: _description_, defaults to 100
+        :type n_test: _type_, optional
+        :return: _description_
+        :rtype: _type_
+        """
         config = locals().copy()
         config.pop("self")
         from pyod.utils.data import generate_data
