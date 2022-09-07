@@ -197,7 +197,7 @@ class DetectionResult:
 
     def visualize(self) -> P:
         clf_name, data = self.clf_name, self.data
-        from pyod.utils.example import visualize as visualize
+        from pyod.utils.example import visualize
         import os
 
         temp = P.cwd()
