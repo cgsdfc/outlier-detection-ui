@@ -6,7 +6,7 @@ import traceback
 from typing import Callable, Dict
 from UserInterface import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
 from PyQt5.QtWidgets import (
     QMessageBox,
     QFileDialog,
@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import (
     QCheckBox,
 )
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from OutlierDetect import RunEvaluator, DetectionConfig, MODEL_ZOO
+from OutlierDetect import RunEvaluator
 import logging
 
 logging.basicConfig(level=logging.INFO)

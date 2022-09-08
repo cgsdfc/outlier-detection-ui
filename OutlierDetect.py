@@ -9,35 +9,31 @@
 2. 其他异常情况；
 3. 可视化的结果；
 """
-from pandas import Timestamp
-
-import_start = Timestamp.now()
 from sklearn.manifold import TSNE
 from dataclasses import dataclass
 import logging
-from typing import Optional, Type
+from typing import Type
 from joblib import Parallel, delayed, Memory
 from numpy import ndarray
 from pyod.models.base import BaseDetector
 from pathlib import Path as P
+
+
+def ensure_dir(dir: P):
+    dir.mkdir(exist_ok=True, parents=True)
+    return dir
+
+
 from typing import Dict
 
 VERBOSE = 999
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("[OutlierDetect]")
 PROJ_DIR = P(__file__).parent
-TMP_DIR = PROJ_DIR.joinpath("tmp")
-TMP_DIR.mkdir(parents=True, exist_ok=True)
-CACHE_DIR = PROJ_DIR.joinpath('.cache')
-CACHE_DIR.mkdir(parents=True, exist_ok=True)
+TMP_DIR = ensure_dir(PROJ_DIR.joinpath("tmp"))
+CACHE_DIR = ensure_dir(PROJ_DIR.joinpath('.cache'))
 MEMORY = Memory(location=CACHE_DIR, verbose=VERBOSE)
 NUM_JOBS = 4
-import_dur = Timestamp.now() - import_start
-LOG.info(f'Import: {import_dur.seconds}')
-
-
-def make_directory_handy(dir: P):
-    dir.mkdir(exist_ok=True, parents=True)
 
 
 def tsne(X: ndarray) -> ndarray:
@@ -63,6 +59,7 @@ class DataConfig:
             from pyod.utils.data import generate_data
 
             d = Data()
+            d.config = self
             d.X_train, d.X_test, d.y_train, d.y_test = generate_data(
                 n_train=self.n_train,
                 n_test=self.n_test,
@@ -85,7 +82,6 @@ class ModelConfig:
 
         @MEMORY.cache
         def _load_model(self: ModelConfig, contamination: float):
-
             cls = MODEL_ZOO.load(self.name)
             ins = cls(contamination=contamination)
             return Model(model_config=self, model=ins)
@@ -123,8 +119,6 @@ class ModelZoo:
     并进行懒加载，因为导入pyod包非常耗时。
     """
 
-    LOG = logging.getLogger("[ModelZoo]")
-
     RAW_TEXT = """\
     #     from pyod.models.abod import ABOD
     #     from pyod.models.auto_encoder import AutoEncoder
@@ -145,21 +139,24 @@ class ModelZoo:
         :return: a dict from class name to module name.
         :rtype: Dict[str, str]
         """
-        import re
 
-        PAT = re.compile(r"\s*\#\s*from pyod\.models\.(\w+) import (\w+)")
-        data = self.RAW_TEXT.splitlines()
-        data = list(map(lambda x: PAT.match(x).groups(), data))
-        data = list(map(lambda x: tuple(reversed(x)), data))
-        self.LOG.info(f"Valid models {data}")
+        @MEMORY.cache
+        def _discover_models(raw_text: str):
+            import re
 
-        return dict(data)
+            PAT = re.compile(r"\s*\#\s*from pyod\.models\.(\w+) import (\w+)")
+            data = raw_text.splitlines()
+            data = list(map(lambda x: PAT.match(x).groups(), data))
+            data = list(map(lambda x: tuple(reversed(x)), data))
+
+            return dict(data)
+
+        return _discover_models(self.RAW_TEXT)
 
     def __init__(self) -> None:
         self.module_map = self.discover_models()
-        self.model_cache = {}
 
-    def load(self, name: str) -> type:
+    def load(self, name: str) -> Type[BaseDetector]:
         """Load a model class by its namae
 
         :param name: the class name of the model.
@@ -168,15 +165,16 @@ class ModelZoo:
         :rtype: type
         """
         assert name in self.module_map, f"Bad model {name}"
-        if name in self.model_cache:
-            return self.model_cache[name]
 
-        modname = self.module_map[name]  # Module name.
-        ctx = {}
-        exec(f"from pyod.models.{modname} import {name}", ctx)
-        modelcls = ctx[name]
-        self.model_cache[name] = modelcls
-        return modelcls
+        @MEMORY.cache
+        def _load_modelcls(self: ModelZoo, name: str):
+            modname = self.module_map[name]  # Module name.
+            ctx = {}
+            exec(f"from pyod.models.{modname} import {name}", ctx)
+            modelcls = ctx[name]
+            return modelcls
+
+        return _load_modelcls(self, name)
 
     @property
     def model_list(self):
@@ -204,39 +202,7 @@ class Data:
     X_test2d = None
 
     # 保存load传入的参数。
-    config: dict = None
-
-    @classmethod
-    def load(self, contamination=0.1, n_train=200, n_test=100, n_features=100):
-        """
-        加载数据集。
-
-        :param contamination: _description_, defaults to 0.1
-        :type contamination: _type_, optional
-        :param n_train: _description_, defaults to 200
-        :type n_train: _type_, optional
-        :param n_test: _description_, defaults to 100
-        :type n_test: _type_, optional
-        :return: _description_
-        :rtype: _type_
-        """
-        config = locals().copy()
-        config.pop("self")
-        from pyod.utils.data import generate_data
-
-        d = Data()
-        d.config = config
-        d.X_train, d.X_test, d.y_train, d.y_test = generate_data(
-            n_train=n_train,
-            n_test=n_test,
-            contamination=contamination,
-            n_features=n_features,
-        )
-        from sklearn.manifold import TSNE
-        d.X_train2d = TSNE().fit_transform(d.X_train)
-        d.X_test2d = TSNE().fit_transform(d.X_test)
-
-        return d
+    config: DataConfig = None
 
     def __repr__(self) -> str:
         return f"Data(config={self.config})"
@@ -247,11 +213,6 @@ class DetectionResult:
     """
     检测结果。基于它可以进行各种可视化和展示。
     """
-
-    # 用到的模型的名字。
-    clf_name: str = None
-    # 用到的数据集。
-    data: Data = None
     # get the prediction labels and outlier scores of the training data
     y_train_pred = None  # binary labels (0: inliers, 1: outliers)
     y_train_scores = None  # raw outlier scores
@@ -260,34 +221,6 @@ class DetectionResult:
     y_test_pred = None  # outlier labels (0 or 1)
     y_test_scores = None  # outlier scores
     y_test_pred_confidence = None
-
-    def visualize(self) -> P:
-        clf_name, data = self.clf_name, self.data
-        from pyod.utils.example import visualize
-        import os
-
-        temp = P.cwd()
-        image = TMP_DIR.joinpath(f"{clf_name}.png")
-        try:
-            image.unlink()
-        except FileNotFoundError:
-            pass
-
-        os.chdir(TMP_DIR)
-        visualize(
-            clf_name,
-            show_figure=False,
-            save_figure=True,
-            X_train=data.X_train2d,
-            y_train=data.y_train,
-            X_test=data.X_test2d,
-            y_test=data.y_test,
-            y_train_pred=self.y_train_pred,
-            y_test_pred=self.y_test_pred,
-        )
-        os.chdir(temp)
-        assert image.is_file()
-        return image
 
 
 @dataclass
@@ -301,66 +234,55 @@ class DetectionEvaluator:
     5. 预测结果可视化；
     """
 
-    config: DetectionConfig
-    model: BaseDetector = None
+    model: Model = None
     data: Data = None
     result: DetectionResult = None
 
-    LOG = logging.getLogger("[Evaluator]")
-
-    def __init__(self, config: DetectionConfig) -> None:
-        self.config = config
-        self.LOG.info(f"init with config {config}")
+    @property
+    def data_config(self):
+        return self.data.config
 
     @property
-    def clf_name(self):
-        return self.config.model_name
+    def model_config(self):
+        return self.model.model_config
 
-    def load_model(self):
-        config = self.config
-        modelcls = MODEL_ZOO.load(config.model_name)
+    def load_model(self, config: ModelConfig):
+        self.model = config.load_model(self.data_config.contamination)
+        return self
 
-        self.model = modelcls(
-            contamination=config.contamination,
-            **(config.model_config or {}),
+    def load_data(self, config: DataConfig):
+        self.data = config.load_data()
+        return self
+
+    def detect(self):
+        self.result = self.model.detect(self.data)
+        return self
+
+    def visualize(self, parent: P):
+        parent = ensure_dir(parent.absolute())
+
+        import os
+        temp = P.cwd()
+        os.chdir(parent)
+        clf_name, data, res = self.model.name, self.data, self.result
+        from pyod.utils.example import visualize
+        visualize(
+            clf_name=clf_name,
+            show_figure=False,
+            save_figure=True,
+            X_train=data.X_train2d,
+            y_train=data.y_train,
+            X_test=data.X_test2d,
+            y_test=data.y_test,
+            y_train_pred=res.y_test_pred,
+            y_test_pred=res.y_test_pred,
         )
-        self.LOG.info(f"Model loaded: {self.model}")
-
-    def load_data(self):
-        config = self.config
-        self.data = Data.load(
-            contamination=config.contamination,
-            n_train=config.n_train,
-            n_test=config.n_test,
-            n_features=config.n_features,
-        )
-        self.LOG.info(f"Data loaded: {self.data}")
-
-    def fit_model(self):
-        assert self.data is not None
-        assert self.model is not None
-
-        self.model.fit(self.data.X_train, self.data.y_train)
-        self.LOG.info(f"Model fit")
-
-    def predict(self) -> DetectionResult:
-        result = DetectionResult(
-            clf_name=self.config.model_name,
-            data=self.data,
-        )
-        result.y_train_pred = self.model.labels_
-        result.y_train_scores = self.model.decision_scores_
-        result.y_test_pred, result.y_test_pred_confidence = self.model.predict(
-            self.data.X_test, return_confidence=True)
-        self.result = result
-        self.LOG.info(f"Model predict")
-        return result
-
-    def visualize(self):
-        image = self.result.visualize()
-        self.LOG.info(f"Visualize {image}")
+        os.chdir(temp)
+        image = parent.joinpath(f'{clf_name}.png')
         return image
 
 
 if __name__ == "__main__":
-    pass
+    ev = DetectionEvaluator()
+    ev.load_data(DataConfig()).load_model(
+        ModelConfig()).detect().visualize(TMP_DIR)
