@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import (
     QCheckBox,
 )
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from OutlierDetect import RunEvaluator
+from OutlierDetect import DetectionEvaluator
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -30,9 +30,8 @@ class MyWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.detection_config = DetectionConfig()
 
-        self.ui.cbModelName.addItems(MODEL_ZOO.model_list)
+        self.ui.cbModelName.addItems(DetectionEvaluator.model_list)
         self.ui.cbModelName.setCurrentText('KNN')
         self.ui.pgbEvaluator.reset()
         self.ui.leNumTrain.setValidator(QIntValidator(1, 1000, self))
@@ -149,8 +148,6 @@ class MyWindow(QtWidgets.QMainWindow):
 
 
 class RunEvaluator(QThread):
-    LOG = logging.getLogger("[RunEvaluator]")
-
     sig_load_data = pyqtSignal(str)
     sig_load_model = pyqtSignal(str)
     sig_predict = pyqtSignal(str)
@@ -170,18 +167,16 @@ class RunEvaluator(QThread):
     def __init__(
         self,
         parent,
-        config: DetectionConfig,
         slot_dict: Dict[str, Callable],
     ):
         super().__init__(parent)
-        self.evaluator = DetectionEvaluator(config)
+        self.evaluator = DetectionEvaluator()
         for key, slot in slot_dict.items():
             try:
                 sig = getattr(self, f'sig_{key}')
             except AttributeError:
                 continue
             sig.connect(slot)
-            self.LOG.info(f'Connect sig-slot {key}')
 
     def run(self) -> None:
         for key in self.ACTION_LIST:
@@ -191,7 +186,7 @@ class RunEvaluator(QThread):
             except Exception as e:
                 self.sig_error.emit('error', str(e))
                 traceback.print_exc()
-                self.LOG.warning(f'Error in action {key}')
+                LOG.warning(f'Error in action {key}')
                 return
             else:
                 sig = getattr(self, f'sig_{key}')

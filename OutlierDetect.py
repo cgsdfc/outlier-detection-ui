@@ -238,6 +238,10 @@ class DetectionEvaluator:
     data: Data = None
     result: DetectionResult = None
 
+    @classmethod
+    def model_list(self):
+        return MODEL_ZOO.model_list
+        
     @property
     def data_config(self):
         return self.data.config
@@ -274,7 +278,7 @@ class DetectionEvaluator:
             y_train=data.y_train,
             X_test=data.X_test2d,
             y_test=data.y_test,
-            y_train_pred=res.y_test_pred,
+            y_train_pred=res.y_train_pred,
             y_test_pred=res.y_test_pred,
         )
         os.chdir(temp)
