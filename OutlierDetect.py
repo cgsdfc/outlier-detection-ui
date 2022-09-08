@@ -9,48 +9,72 @@
 2. 其他异常情况；
 3. 可视化的结果；
 """
-# Don't import large package here!
-# Import when you need it.
+from pandas import Timestamp
+
+import_start = Timestamp.now()
+from sklearn.manifold import TSNE
 from dataclasses import dataclass
-from pprint import pprint
 import logging
-import traceback
-from typing import Any
-
-if False:
-    from pyod.models.base import BaseDetector
-else:
-    BaseDetector = Any
-
+from typing import Optional, Type
+from joblib import Parallel, delayed, Memory
+from numpy import ndarray
+from pyod.models.base import BaseDetector
 from pathlib import Path as P
-from PyQt5.QtCore import QThread, pyqtSignal
-from typing import Callable, Dict
+from typing import Dict
 
+VERBOSE = 999
 logging.basicConfig(level=logging.INFO)
-
+LOG = logging.getLogger("[OutlierDetect]")
 PROJ_DIR = P(__file__).parent
 TMP_DIR = PROJ_DIR.joinpath("tmp")
 TMP_DIR.mkdir(parents=True, exist_ok=True)
+CACHE_DIR = PROJ_DIR.joinpath('.cache')
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
+MEMORY = Memory(location=CACHE_DIR, verbose=VERBOSE)
+NUM_JOBS = 4
+import_dur = Timestamp.now() - import_start
+LOG.info(f'Import: {import_dur.seconds}')
+
+
+def make_directory_handy(dir: P):
+    dir.mkdir(exist_ok=True, parents=True)
+
+
+def tsne(X: ndarray) -> ndarray:
+    return TSNE(n_jobs=2).fit_transform(X)
 
 
 @dataclass
-class DetectionConfig:
-    """
-    配置一次运行的所有参数。
-    """
+class DataConfig:
+    contamination: float = 0.1
+    n_train: int = 200
+    n_test: int = 100
+    n_features: int = 10
+    seed: int = 32
 
-    # 模型的名字，比如 ABOD
-    model_name: str = None
-    # outlier 所占的比例
-    contamination: float = None
-    # 训练样本的数量
-    n_train: int = None
-    # 测试样本的数量
-    n_test: int = None
-    # 特征维度
-    n_features: int = None
-    # 传给模型构造器的额外参数
-    model_config: dict = None
+    @property
+    def contamination_percent(self):
+        return int(100 * self.contamination)
+
+    def load_data(self) -> 'Data':
+
+        @MEMORY.cache
+        def _load_data(self: DataConfig):
+            from pyod.utils.data import generate_data
+
+            d = Data()
+            d.X_train, d.X_test, d.y_train, d.y_test = generate_data(
+                n_train=self.n_train,
+                n_test=self.n_test,
+                contamination=self.contamination,
+                n_features=self.n_features,
+                random_state=self.seed,
+            )
+            d.X_train2d, d.X_test2d = Parallel(2)(
+                delayed(tsne)(X) for X in [d.X_train, d.X_test])
+            return d
+    
+        return _load_data(self)
 
 
 class ModelZoo:
@@ -163,7 +187,9 @@ class Data:
         d = Data()
         d.config = config
         d.X_train, d.X_test, d.y_train, d.y_test = generate_data(
-            n_train=n_train, n_test=n_test, contamination=contamination,
+            n_train=n_train,
+            n_test=n_test,
+            contamination=contamination,
             n_features=n_features,
         )
         from sklearn.manifold import TSNE
@@ -285,8 +311,7 @@ class DetectionEvaluator:
         result.y_train_pred = self.model.labels_
         result.y_train_scores = self.model.decision_scores_
         result.y_test_pred, result.y_test_pred_confidence = self.model.predict(
-            self.data.X_test, return_confidence=True
-        )
+            self.data.X_test, return_confidence=True)
         self.result = result
         self.LOG.info(f"Model predict")
         return result
