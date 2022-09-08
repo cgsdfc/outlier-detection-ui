@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>异常检测仿真程序</string>
+   <string/>
   </property>
   <property name="styleSheet">
    <string notr="true">/*  ------------------------------------------------------------------------  */
