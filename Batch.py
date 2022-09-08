@@ -36,9 +36,11 @@ def get_args(rate_list, model_list, root):
 
 def batch_run():
     model_list = MODEL_ZOO.model_list
+    rate_list = [0.1, 0.3, 0.5]
 
-    Parallel(NUM_JOBS,
-             verbose=VERBOSE)(delayed(run)(*args) for args in get_args())
+    Parallel(NUM_JOBS, verbose=VERBOSE)(
+        delayed(run)(*args)
+        for args in get_args(rate_list, model_list, OUTPUT_DIR))
 
 
 if __name__ == "__main__":
