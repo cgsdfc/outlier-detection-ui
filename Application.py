@@ -2,6 +2,8 @@
 这个文件要实现UI的回调，处理用户输入，以及启动异常检测程序。
 """
 
+import traceback
+from typing import Callable, Dict
 from UserInterface import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import pyqtSlot
@@ -17,11 +19,13 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from OutlierDetect import RunEvaluator, DetectionConfig, MODEL_ZOO
 import logging
+
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("[Application]")
 
 
 class MyWindow(QtWidgets.QMainWindow):
+
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
@@ -36,13 +40,13 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
         self.ui.lbProgress.setText('就绪')
         self.ui.lbImage.setScaledContents(True)
-        
+
         self.ui.leNumTrain.setText('200')
         self.ui.leNumTrain.editingFinished.emit()
 
         self.ui.leNumTest.setText('100')
         self.ui.leNumTest.editingFinished.emit()
-        
+
         self.ui.leOutlierRate.setText('0.1')
         self.ui.leOutlierRate.editingFinished.emit()
 
@@ -95,7 +99,7 @@ class MyWindow(QtWidgets.QMainWindow):
         LOG.info(f'pbRunDetect clicked')
         pgb = self.ui.pgbEvaluator
         pgb.reset()
-        pgb.setRange(0, len(RunEvaluator.ACTION_LIST)-1)
+        pgb.setRange(0, len(RunEvaluator.ACTION_LIST) - 1)
         self.ui.lbProgress.setText('检测中')
 
         job = RunEvaluator(
@@ -125,9 +129,9 @@ class MyWindow(QtWidgets.QMainWindow):
 
         def on_error(tag: str, msg: str):
             LOG.info(f'Error {msg}, tag {tag}')
-            QMessageBox.warning(
-                self, '错误', msg, QMessageBox.StandardButton.Yes,
-                QMessageBox.StandardButton.Yes)
+            QMessageBox.warning(self, '错误', msg,
+                                QMessageBox.StandardButton.Yes,
+                                QMessageBox.StandardButton.Yes)
 
         def on_progress(tag: str):
             assert tag in self.ACTION_TO_PROGRESS
@@ -142,6 +146,59 @@ class MyWindow(QtWidgets.QMainWindow):
         slot_dict = {tag: on_progress for tag in RunEvaluator.ACTION_LIST}
         slot_dict.update(visualize=on_visualize, error=on_error)
         return slot_dict
+
+
+class RunEvaluator(QThread):
+    LOG = logging.getLogger("[RunEvaluator]")
+
+    sig_load_data = pyqtSignal(str)
+    sig_load_model = pyqtSignal(str)
+    sig_predict = pyqtSignal(str)
+    sig_fit_model = pyqtSignal(str)
+    sig_visualize = pyqtSignal(str, str)
+    sig_error = pyqtSignal(str, str)
+
+    # error not in here!!
+    ACTION_LIST = [
+        'load_data',
+        'load_model',
+        'fit_model',
+        'predict',
+        'visualize',
+    ]
+
+    def __init__(
+        self,
+        parent,
+        config: DetectionConfig,
+        slot_dict: Dict[str, Callable],
+    ):
+        super().__init__(parent)
+        self.evaluator = DetectionEvaluator(config)
+        for key, slot in slot_dict.items():
+            try:
+                sig = getattr(self, f'sig_{key}')
+            except AttributeError:
+                continue
+            sig.connect(slot)
+            self.LOG.info(f'Connect sig-slot {key}')
+
+    def run(self) -> None:
+        for key in self.ACTION_LIST:
+            action = getattr(self.evaluator, key)
+            try:
+                ret = action()
+            except Exception as e:
+                self.sig_error.emit('error', str(e))
+                traceback.print_exc()
+                self.LOG.warning(f'Error in action {key}')
+                return
+            else:
+                sig = getattr(self, f'sig_{key}')
+                if key == 'visualize':
+                    sig.emit(key, str(ret))
+                else:
+                    sig.emit(key)
 
 
 if __name__ == "__main__":

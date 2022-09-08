@@ -73,8 +73,48 @@ class DataConfig:
             d.X_train2d, d.X_test2d = Parallel(2)(
                 delayed(tsne)(X) for X in [d.X_train, d.X_test])
             return d
-    
+
         return _load_data(self)
+
+
+@dataclass
+class ModelConfig:
+    name: str = 'KNN'
+
+    def load_model(self, contamination: float):
+
+        @MEMORY.cache
+        def _load_model(self: ModelConfig, contamination: float):
+
+            cls = MODEL_ZOO.load(self.name)
+            ins = cls(contamination=contamination)
+            return Model(model_config=self, model=ins)
+
+        return _load_model(self, contamination)
+
+
+@dataclass
+class Model:
+    model_config: ModelConfig
+    model: BaseDetector
+
+    @property
+    def name(self):
+        return self.model_config.name
+
+    def detect(self, data: 'Data'):
+
+        @MEMORY.cache
+        def _detect(self: Model, data: Data):
+            self.model.fit(data.X_train, data.y_train)
+            res = DetectionResult()
+            res.y_train_pred = self.model.labels_
+            res.y_train_scores = self.model.decision_scores_
+            res.y_test_pred, res.y_test_pred_confidence = self.model.predict(
+                data.X_test, return_confidence=True)
+            return res
+
+        return _detect(self, data)
 
 
 class ModelZoo:
@@ -320,59 +360,6 @@ class DetectionEvaluator:
         image = self.result.visualize()
         self.LOG.info(f"Visualize {image}")
         return image
-
-
-class RunEvaluator(QThread):
-    LOG = logging.getLogger("[RunEvaluator]")
-
-    sig_load_data = pyqtSignal(str)
-    sig_load_model = pyqtSignal(str)
-    sig_predict = pyqtSignal(str)
-    sig_fit_model = pyqtSignal(str)
-    sig_visualize = pyqtSignal(str, str)
-    sig_error = pyqtSignal(str, str)
-
-    # error not in here!!
-    ACTION_LIST = [
-        'load_data',
-        'load_model',
-        'fit_model',
-        'predict',
-        'visualize',
-    ]
-
-    def __init__(
-        self,
-        parent,
-        config: DetectionConfig,
-        slot_dict: Dict[str, Callable],
-    ):
-        super().__init__(parent)
-        self.evaluator = DetectionEvaluator(config)
-        for key, slot in slot_dict.items():
-            try:
-                sig = getattr(self, f'sig_{key}')
-            except AttributeError:
-                continue
-            sig.connect(slot)
-            self.LOG.info(f'Connect sig-slot {key}')
-
-    def run(self) -> None:
-        for key in self.ACTION_LIST:
-            action = getattr(self.evaluator, key)
-            try:
-                ret = action()
-            except Exception as e:
-                self.sig_error.emit('error', str(e))
-                traceback.print_exc()
-                self.LOG.warning(f'Error in action {key}')
-                return
-            else:
-                sig = getattr(self, f'sig_{key}')
-                if key == 'visualize':
-                    sig.emit(key, str(ret))
-                else:
-                    sig.emit(key)
 
 
 if __name__ == "__main__":
