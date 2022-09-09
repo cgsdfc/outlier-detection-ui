@@ -17,6 +17,7 @@ from joblib import Parallel, delayed, Memory
 from numpy import ndarray
 from pyod.models.base import BaseDetector
 from pathlib import Path as P
+import os
 
 
 def ensure_dir(dir: P):
@@ -34,6 +35,15 @@ TMP_DIR = ensure_dir(PROJ_DIR.joinpath("tmp"))
 CACHE_DIR = ensure_dir(PROJ_DIR.joinpath('.cache'))
 MEMORY = Memory(location=CACHE_DIR, verbose=VERBOSE)
 NUM_JOBS = 1
+
+EAGER = os.getenv('ODQT_EAGER', '')
+if EAGER:
+    LOG.info('EAGER loading pyod modules...')
+    import PYODLIBS
+    LOG.info('Done')
+else:
+    PYODLIBS = None
+
 
 def tsne(X: ndarray) -> ndarray:
     return TSNE(n_jobs=1).fit_transform(X)
@@ -70,7 +80,7 @@ class DataConfig:
             d.X_train2d, d.X_test2d = Parallel(1)(
                 delayed(tsne)(X) for X in [d.X_train, d.X_test])
             LOG.info('End TSNE')
-            
+
             return d
 
         return _load_data(self)
@@ -158,7 +168,7 @@ class ModelZoo:
     def __init__(self, **renames) -> None:
         self.module_map = self.discover_models()
         self.real2display = renames
-        self.display2real = {val:key for key, val in renames.items()}
+        self.display2real = {val: key for key, val in renames.items()}
 
     def load(self, disname: str) -> Type[BaseDetector]:
         """Load a model class by its namae
@@ -170,6 +180,8 @@ class ModelZoo:
         """
         name = self.dis2real(disname)
         assert name in self.module_map, f"Bad model {name}"
+        if EAGER:
+            return getattr(PYODLIBS, name)
 
         @MEMORY.cache
         def _load_modelcls(self: ModelZoo, name: str):

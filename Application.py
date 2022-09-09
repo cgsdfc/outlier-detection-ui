@@ -230,11 +230,11 @@ class RunEvaluator(QThread):
                     sig.emit(key)
 
 
-# if __name__ == "__main__":
-#     import sys
+if __name__ == "__main__":
+    import sys
 
-#     app = QtWidgets.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
 
-#     w = MyWindow()
-#     w.show()
-#     sys.exit(app.exec_())
+    w = MyWindow()
+    w.show()
+    sys.exit(app.exec_())
