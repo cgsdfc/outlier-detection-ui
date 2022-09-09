@@ -33,10 +33,10 @@ PROJ_DIR = P(__file__).parent
 TMP_DIR = ensure_dir(PROJ_DIR.joinpath("tmp"))
 CACHE_DIR = ensure_dir(PROJ_DIR.joinpath('.cache'))
 MEMORY = Memory(location=CACHE_DIR, verbose=VERBOSE)
-NUM_JOBS = 4
+NUM_JOBS = 1
 
 def tsne(X: ndarray) -> ndarray:
-    return TSNE(n_jobs=2).fit_transform(X)
+    return TSNE(n_jobs=1).fit_transform(X)
 
 
 @dataclass

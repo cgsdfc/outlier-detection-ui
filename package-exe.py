@@ -5,4 +5,4 @@ from NAME import NAME
 
 os.system(f'python scripts/convert-ico.py ./desk.png')
 os.system(
-    f'pyinstaller ./Application.py --name {NAME} -w --noconfirm -i desk.ico')
+    f'pyinstaller ./app.py --name {NAME} --noconfirm -i desk.ico')
