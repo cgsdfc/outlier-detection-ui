@@ -23,15 +23,6 @@ import logging
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("[Application]")
 
-# class RENAME:
-#     _NAMES = dict(KNN='K近邻', AutoEncoder='多视角聚类')
-#     MODEL_NAMES_REV = {}
-#     MODEL_NAMES = {}
-#     for key, val in _NAMES:
-#         val2 = f'基于{val}的异常检测方法'
-#         MODEL_NAMES[key] = val2
-#         MODEL_NAMES[val2] = key
-
 
 class MyWindow(QtWidgets.QMainWindow):
 

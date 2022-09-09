@@ -152,10 +152,12 @@ class ModelZoo:
 
         return _discover_models(self.RAW_TEXT)
 
-    def __init__(self) -> None:
+    def __init__(self, **renames) -> None:
         self.module_map = self.discover_models()
+        self.real2display = renames
+        self.display2real = {val:key for key, val in renames.items()}
 
-    def load(self, name: str) -> Type[BaseDetector]:
+    def load(self, disname: str) -> Type[BaseDetector]:
         """Load a model class by its namae
 
         :param name: the class name of the model.
@@ -163,6 +165,7 @@ class ModelZoo:
         :return: the type object.
         :rtype: type
         """
+        name = self.dis2real(disname)
         assert name in self.module_map, f"Bad model {name}"
 
         @MEMORY.cache
@@ -180,10 +183,17 @@ class ModelZoo:
         """
         Return all valid names of models.
         """
-        return list(self.module_map.keys())
+        disnames = list(map(self.real2dis, self.module_map.keys()))
+        return disnames
+
+    def real2dis(self, real: str):
+        return self.real2display.get(real, real)
+
+    def dis2real(self, dis: str):
+        return self.display2real.get(dis, dis)
 
 
-MODEL_ZOO = ModelZoo()
+MODEL_ZOO = ModelZoo(AutoEncoder='MVC')
 
 
 @dataclass
