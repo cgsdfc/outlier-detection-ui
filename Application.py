@@ -17,21 +17,20 @@ from PyQt5.QtWidgets import (
     QCheckBox,
 )
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from OutlierDetect import DetectionEvaluator
+from OutlierDetect import MODEL_ZOO, DataConfig, DetectionEvaluator, ModelConfig
 import logging
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("[Application]")
 
-
-class RENAME:
-    _NAMES = dict(KNN='K近邻', AutoEncoder='多视角聚类')
-    MODEL_NAMES_REV = {}
-    MODEL_NAMES = {}
-    for key, val in _NAMES:
-        val2 = f'基于{val}的异常检测方法'
-        MODEL_NAMES[key] = val2
-        MODEL_NAMES[val2] = key
+# class RENAME:
+#     _NAMES = dict(KNN='K近邻', AutoEncoder='多视角聚类')
+#     MODEL_NAMES_REV = {}
+#     MODEL_NAMES = {}
+#     for key, val in _NAMES:
+#         val2 = f'基于{val}的异常检测方法'
+#         MODEL_NAMES[key] = val2
+#         MODEL_NAMES[val2] = key
 
 
 class MyWindow(QtWidgets.QMainWindow):
@@ -41,38 +40,36 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.ui.cbModelName.addItems(DetectionEvaluator.model_list)
-        self.ui.cbModelName.setCurrentText('KNN')
         self.ui.pgbEvaluator.reset()
         self.ui.leNumTrain.setValidator(QIntValidator(1, 1000, self))
         self.ui.leNumTest.setValidator(QIntValidator(0, 500, self))
         self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
         self.ui.lbProgress.setText('就绪')
         self.ui.lbImage.setScaledContents(True)
+        self.data_config = DataConfig()
+        self.model_config = ModelConfig()
+        self.ui.cbModelName.addItems(MODEL_ZOO.model_list)
+        self.ui.cbModelName.setCurrentText('KNN')
 
-        self.ui.leNumTrain.setText('200')
-        self.ui.leNumTrain.editingFinished.emit()
+        from NAME import NAME
+        self.ui.centralwidget.setWindowTitle(NAME)
 
-        self.ui.leNumTest.setText('100')
-        self.ui.leNumTest.editingFinished.emit()
-
-        self.ui.leOutlierRate.setText('0.1')
-        self.ui.leOutlierRate.editingFinished.emit()
-
-        self.ui.leNumFeas.setText('100')
-        self.ui.leNumFeas.editingFinished.emit()
+        self.ui.leNumTrain.setText(str(self.data_config.n_train))
+        self.ui.leNumTest.setText(str(self.data_config.n_test))
+        self.ui.leOutlierRate.setText(str(self.data_config.contamination))
+        self.ui.leNumFeas.setText(str(self.data_config.n_features))
 
     @pyqtSlot(str)
     def on_cbModelName_currentTextChanged(self, value: str):
         LOG.info(f'cbModelName: {value}')
-        self.detection_config.model_name = value
+        self.model_config.name = value
 
     @pyqtSlot()
     def on_leNumTrain_editingFinished(self):
         value = self.ui.leNumTrain.text()
         LOG.info(f'leNumTrain: {value}')
         try:
-            self.detection_config.n_train = int(value)
+            self.data_config.n_train = int(value)
         except ValueError:
             pass
 
@@ -81,7 +78,7 @@ class MyWindow(QtWidgets.QMainWindow):
         value = self.ui.leNumTest.text()
         LOG.info(f'leNumTest: {value}')
         try:
-            self.detection_config.n_test = int(value)
+            self.data_config.n_test = int(value)
         except ValueError:
             pass
 
@@ -90,7 +87,7 @@ class MyWindow(QtWidgets.QMainWindow):
         value = self.ui.leOutlierRate.text()
         LOG.info(f'leOutlierRate: {value}')
         try:
-            self.detection_config.contamination = float(value)
+            self.data_config.contamination = float(value)
         except ValueError:
             pass
 
@@ -99,7 +96,7 @@ class MyWindow(QtWidgets.QMainWindow):
         value = self.ui.leNumFeas.text()
         LOG.info(f'leNumFeas: {value}')
         try:
-            self.detection_config.n_features = int(value)
+            self.data_config.n_features = int(value)
         except ValueError:
             pass
 

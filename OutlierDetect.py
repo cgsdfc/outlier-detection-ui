@@ -35,7 +35,6 @@ CACHE_DIR = ensure_dir(PROJ_DIR.joinpath('.cache'))
 MEMORY = Memory(location=CACHE_DIR, verbose=VERBOSE)
 NUM_JOBS = 4
 
-
 def tsne(X: ndarray) -> ndarray:
     return TSNE(n_jobs=2).fit_transform(X)
 
@@ -238,10 +237,6 @@ class DetectionEvaluator:
     data: Data = None
     result: DetectionResult = None
 
-    @classmethod
-    def model_list(self):
-        return MODEL_ZOO.model_list
-        
     @property
     def data_config(self):
         return self.data.config
