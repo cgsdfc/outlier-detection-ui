@@ -66,8 +66,11 @@ class DataConfig:
                 n_features=self.n_features,
                 random_state=self.seed,
             )
-            d.X_train2d, d.X_test2d = Parallel(2)(
+            LOG.info(f'Begin TSNE')
+            d.X_train2d, d.X_test2d = Parallel(1)(
                 delayed(tsne)(X) for X in [d.X_train, d.X_test])
+            LOG.info('End TSNE')
+            
             return d
 
         return _load_data(self)
