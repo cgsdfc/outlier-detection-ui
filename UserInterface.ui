@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>异常检测仿真程序</string>
+   <string>异常流量数据分析软件</string>
   </property>
   <property name="styleSheet">
    <string notr="true">/*  ------------------------------------------------------------------------  */
@@ -1378,25 +1378,24 @@ QMenuBar QToolButton {
              <layout class="QGridLayout" name="gridLayout_5">
               <item row="1" column="1">
                <layout class="QGridLayout" name="gridLayout_4" rowstretch="1,1">
-                <item row="0" column="4">
-                 <widget class="QLabel" name="label_3">
-                  <property name="text">
-                   <string>测试样本数</string>
+                <item row="1" column="3">
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
                   </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
                   </property>
-                 </widget>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
-                <item row="0" column="6">
-                 <widget class="QLabel" name="label_4">
-                  <property name="text">
-                   <string>异常点比例</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
+                <item row="1" column="0">
+                 <widget class="QComboBox" name="cbModelName"/>
                 </item>
                 <item row="1" column="5">
                  <spacer name="horizontalSpacer_6">
@@ -1414,89 +1413,20 @@ QMenuBar QToolButton {
                   </property>
                  </spacer>
                 </item>
-                <item row="1" column="4">
-                 <widget class="QLineEdit" name="leNumTest">
+                <item row="0" column="6">
+                 <widget class="QLabel" name="label_4">
                   <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <spacer name="horizontalSpacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item row="1" column="6">
-                 <widget class="QLineEdit" name="leOutlierRate">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="8">
-                 <widget class="QLineEdit" name="leNumFeas"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QComboBox" name="cbModelName"/>
-                </item>
-                <item row="1" column="3">
-                 <spacer name="horizontalSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item row="0" column="2">
-                 <widget class="QLabel" name="label_2">
-                  <property name="text">
-                   <string>训练样本数</string>
+                   <string>异常点比例</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="8">
-                 <widget class="QLabel" name="label_5">
+                <item row="0" column="4">
+                 <widget class="QLabel" name="label_3">
                   <property name="text">
-                   <string>特征维数</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="2">
-                 <widget class="QLineEdit" name="leNumTrain">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label">
-                  <property name="text">
-                   <string>选择模型</string>
+                   <string>测试样本数</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
@@ -1518,6 +1448,105 @@ QMenuBar QToolButton {
                    </size>
                   </property>
                  </spacer>
+                </item>
+                <item row="1" column="8">
+                 <widget class="QLineEdit" name="leNumFeas"/>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>选择模型</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLineEdit" name="leNumTrain">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="1" column="4">
+                 <widget class="QLineEdit" name="leNumTest">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="10">
+                 <widget class="QLineEdit" name="leSeed"/>
+                </item>
+                <item row="0" column="8">
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>特征维数</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="6">
+                 <widget class="QLineEdit" name="leOutlierRate">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>训练样本数</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="9">
+                 <spacer name="horizontalSpacer_8">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="10">
+                 <widget class="QLabel" name="label_6">
+                  <property name="text">
+                   <string>随机种子</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>

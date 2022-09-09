@@ -58,11 +58,22 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.leNumTest.setText(str(self.data_config.n_test))
         self.ui.leOutlierRate.setText(str(self.data_config.contamination))
         self.ui.leNumFeas.setText(str(self.data_config.n_features))
+        self.ui.leSeed.setText(str(self.data_config.seed))
+        self.job: RunEvaluator = None
 
     @pyqtSlot(str)
     def on_cbModelName_currentTextChanged(self, value: str):
         LOG.info(f'cbModelName: {value}')
         self.model_config.name = value
+
+    @pyqtSlot()
+    def on_leSeed_editingFinished(self):
+        value = self.ui.leSeed.text()
+        LOG.info(f'leSeed: {value}')
+        try:
+            self.data_config.seed = int(value)
+        except ValueError:
+            pass
 
     @pyqtSlot()
     def on_leNumTrain_editingFinished(self):
@@ -103,17 +114,22 @@ class MyWindow(QtWidgets.QMainWindow):
     @pyqtSlot()
     def on_pbRunDetect_clicked(self):
         LOG.info(f'pbRunDetect clicked')
+        if self.job is not None:
+            QMessageBox.warning(self, '警告', '检测进行中，请等待',
+                                QMessageBox.StandardButton.Yes,
+                                QMessageBox.StandardButton.Yes)
+            return
+
         pgb = self.ui.pgbEvaluator
         pgb.reset()
         pgb.setRange(0, len(RunEvaluator.ACTION_LIST) - 1)
         self.ui.lbProgress.setText('检测中')
-
-        job = RunEvaluator(
+        self.job = RunEvaluator(
             parent=self,
             config=self.detection_config,
             slot_dict=self.build_slot_dict(),
         )
-        job.start()
+        self.job.start()
 
     ACTION_TO_PROGRESS = dict(
         load_data='数据加载完成',
@@ -122,6 +138,14 @@ class MyWindow(QtWidgets.QMainWindow):
         predict='模型预测完成',
         visualize='可视化完成',
     )
+
+    def reset_job(self):
+        if self.job is None:
+            return
+        self.job.quit()
+        self.job.wait()
+        self.job.deleteLater()
+        self.job = None
 
     def build_slot_dict(self):
 
@@ -132,12 +156,14 @@ class MyWindow(QtWidgets.QMainWindow):
             assert not image.isNull()
             label.setPixmap(image)
             LOG.info(f'Label on {image}, tag {tag}')
+            self.reset_job()
 
         def on_error(tag: str, msg: str):
             LOG.info(f'Error {msg}, tag {tag}')
             QMessageBox.warning(self, '错误', msg,
                                 QMessageBox.StandardButton.Yes,
                                 QMessageBox.StandardButton.Yes)
+            self.reset_job()
 
         def on_progress(tag: str):
             assert tag in self.ACTION_TO_PROGRESS
