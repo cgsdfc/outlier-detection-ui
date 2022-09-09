@@ -42,9 +42,9 @@ def tsne(X: ndarray) -> ndarray:
 @dataclass
 class DataConfig:
     contamination: float = 0.1
-    n_train: int = 200
-    n_test: int = 100
-    n_features: int = 10
+    n_train: int = 500
+    n_test: int = 300
+    n_features: int = 50
     seed: int = 32
 
     @property
@@ -257,7 +257,8 @@ class DetectionEvaluator:
         self.result = self.model.detect(self.data)
         return self
 
-    def visualize(self, parent: P):
+    def visualize(self, parent: P = None):
+        parent = parent or TMP_DIR
         parent = ensure_dir(parent.absolute())
 
         import os

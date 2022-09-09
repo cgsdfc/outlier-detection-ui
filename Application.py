@@ -41,8 +41,8 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
 
         self.ui.pgbEvaluator.reset()
-        self.ui.leNumTrain.setValidator(QIntValidator(1, 1000, self))
-        self.ui.leNumTest.setValidator(QIntValidator(0, 500, self))
+        self.ui.leNumTrain.setValidator(QIntValidator(1, 10000, self))
+        self.ui.leNumTest.setValidator(QIntValidator(1, 5000, self))
         self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
         self.ui.lbProgress.setText('就绪')
         self.ui.lbImage.setScaledContents(True)
@@ -126,7 +126,8 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.lbProgress.setText('检测中')
         self.job = RunEvaluator(
             parent=self,
-            config=self.detection_config,
+            data_config=self.data_config,
+            model_config=self.model_config,
             slot_dict=self.build_slot_dict(),
         )
         self.job.start()
@@ -134,8 +135,7 @@ class MyWindow(QtWidgets.QMainWindow):
     ACTION_TO_PROGRESS = dict(
         load_data='数据加载完成',
         load_model='模型加载完成',
-        fit_model='模型训练完成',
-        predict='模型预测完成',
+        detect='检测完成',
         visualize='可视化完成',
     )
 
@@ -183,8 +183,7 @@ class MyWindow(QtWidgets.QMainWindow):
 class RunEvaluator(QThread):
     sig_load_data = pyqtSignal(str)
     sig_load_model = pyqtSignal(str)
-    sig_predict = pyqtSignal(str)
-    sig_fit_model = pyqtSignal(str)
+    sig_detect = pyqtSignal(str)
     sig_visualize = pyqtSignal(str, str)
     sig_error = pyqtSignal(str, str)
 
@@ -192,17 +191,20 @@ class RunEvaluator(QThread):
     ACTION_LIST = [
         'load_data',
         'load_model',
-        'fit_model',
-        'predict',
+        'detect',
         'visualize',
     ]
 
     def __init__(
         self,
         parent,
+        data_config: DataConfig,
+        model_config: ModelConfig,
         slot_dict: Dict[str, Callable],
     ):
         super().__init__(parent)
+        self.data_config = data_config
+        self.model_config = model_config
         self.evaluator = DetectionEvaluator()
         for key, slot in slot_dict.items():
             try:
@@ -211,11 +213,19 @@ class RunEvaluator(QThread):
                 continue
             sig.connect(slot)
 
+    def get_args(self, key):
+        if key == 'load_data':
+            return (self.data_config, )
+        if key == 'load_model':
+            return (self.model_config, )
+        return tuple()
+
     def run(self) -> None:
         for key in self.ACTION_LIST:
             action = getattr(self.evaluator, key)
+            args = self.get_args(key)
             try:
-                ret = action()
+                ret = action(*args)
             except Exception as e:
                 self.sig_error.emit('error', str(e))
                 traceback.print_exc()
