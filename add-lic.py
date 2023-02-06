@@ -20,13 +20,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from pyod.models.abod import ABOD
-from pyod.models.auto_encoder import AutoEncoder
-from pyod.models.cblof import CBLOF
-from pyod.models.hbos import HBOS
-from pyod.models.iforest import IForest
-from pyod.models.knn import KNN
-from pyod.models.lof import LOF
-from pyod.models.mcd import MCD
-from pyod.models.ocsvm import OCSVM
-from pyod.models.pca import PCA
+
+
+from pathlib import Path as P
+
+COMMENT_CHARS = "#"
+
+lic = P("./LICENSE").read_text().splitlines()
+lic = [" ".join([COMMENT_CHARS, line]) for line in lic]
+lic = "\n".join(lic) + "\n\n"
+
+import itertools
+
+for f in itertools.chain(
+    P(".").rglob("*.py"),
+):
+    code = lic + f.read_text()
+    f.write_text(code)
