@@ -230,7 +230,7 @@ class ModelZoo:
         return self.display2real.get(dis, dis)
 
 
-MODEL_ZOO = ModelZoo(AutoEncoder="MVC")
+MODEL_ZOO = ModelZoo()
 
 
 @dataclass
@@ -391,7 +391,7 @@ def visualize(
     )
 
     # plot ground truth vs. predicted results
-    fig = plt.figure(figsize=(10, 8))
+    fig = plt.figure(figsize=(8, 4))
     # plt.suptitle("Demo of {clf_name} Detector".format(clf_name=clf_name), fontsize=15)
 
     fig.add_subplot(221)
@@ -432,7 +432,7 @@ def visualize(
     plt.tight_layout()
 
     if save_figure:
-        plt.savefig("{clf_name}.png".format(clf_name=clf_name), dpi=300)
+        plt.savefig("{clf_name}.png".format(clf_name=clf_name), dpi=600)
 
     if show_figure:
         plt.show()
@@ -478,13 +478,15 @@ class DetectionEvaluator:
         parent = ensure_dir(parent.absolute())
 
         import os
+        import multiprocessing
 
         temp = P.cwd()
         os.chdir(parent)
         clf_name, data, res = self.model.name, self.data, self.result
-        # from pyod.utils.example import visualize
-        Parallel(2)(
-            delayed(visualize)(
+
+        p = multiprocessing.Process(
+            target=visualize,
+            kwargs=dict(
                 clf_name=clf_name,
                 show_figure=False,
                 save_figure=True,
@@ -494,9 +496,11 @@ class DetectionEvaluator:
                 y_test=data.y_test,
                 y_train_pred=res.y_train_pred,
                 y_test_pred=res.y_test_pred,
-            )
-            for _ in range(1)
+            ),
         )
+        p.start()
+        p.join()
+
         os.chdir(temp)
         image = parent.joinpath(f"{clf_name}.png")
         return image
