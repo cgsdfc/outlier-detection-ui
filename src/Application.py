@@ -21,7 +21,8 @@
 # SOFTWARE.
 
 """
-这个文件要实现UI的回调，处理用户输入，以及启动异常检测程序。
+This file implements the UI callbacks, handling of the user's input, and launching
+the PyOD-based backend.
 """
 
 import traceback
@@ -56,7 +57,7 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.leNumTrain.setValidator(QIntValidator(1, 10000, self))
         self.ui.leNumTest.setValidator(QIntValidator(1, 5000, self))
         self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
-        self.ui.lbProgress.setText("就绪")
+        self.ui.lbProgress.setText("Ready")
         self.ui.lbImage.setScaledContents(True)
         self.data_config = DataConfig()
         self.model_config = ModelConfig()
@@ -130,8 +131,8 @@ class MyWindow(QtWidgets.QMainWindow):
         if self.job is not None:
             QMessageBox.warning(
                 self,
-                "警告",
-                "检测进行中，请等待",
+                "Warning",
+                "Detection in progress. Please wait!",
                 QMessageBox.StandardButton.Yes,
                 QMessageBox.StandardButton.Yes,
             )
@@ -140,7 +141,7 @@ class MyWindow(QtWidgets.QMainWindow):
         pgb = self.ui.pgbEvaluator
         pgb.reset()
         pgb.setRange(0, len(RunEvaluator.ACTION_LIST) - 1)
-        self.ui.lbProgress.setText("检测中")
+        self.ui.lbProgress.setText("Detecting...")
         self.job = RunEvaluator(
             parent=self,
             data_config=self.data_config,
@@ -150,10 +151,10 @@ class MyWindow(QtWidgets.QMainWindow):
         self.job.start()
 
     ACTION_TO_PROGRESS = dict(
-        load_data="数据加载完成",
-        load_model="模型加载完成",
-        detect="检测完成",
-        visualize="可视化完成",
+        load_data="Dataset loaded",
+        load_model="Model loaded",
+        detect="Detection done",
+        visualize="Visualization done",
     )
 
     def reset_job(self):
@@ -178,7 +179,7 @@ class MyWindow(QtWidgets.QMainWindow):
             LOG.info(f"Error {msg}, tag {tag}")
             QMessageBox.warning(
                 self,
-                "错误",
+                "Error",
                 msg,
                 QMessageBox.StandardButton.Yes,
                 QMessageBox.StandardButton.Yes,

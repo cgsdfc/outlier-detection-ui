@@ -20,5 +20,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-NAME = "异常流量数据分析软件"
+NAME = "Outlier Detection Demon"
 print(f"NAME IS {NAME}")

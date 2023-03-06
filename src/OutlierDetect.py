@@ -21,15 +21,15 @@
 # SOFTWARE.
 
 """
-这个文件要实现对异常检测框架PyOD的封装。
-为Application提供接口。我们的输入：
-1. 数据集，一般是numpy或者pandas格式；
-2. 方法的种类（名称）；
-3. 方法的超参数；
-我们的输出：
-1. 方法运行的结果；
-2. 其他异常情况；
-3. 可视化的结果；
+The file implements the backend based on the PyOD framework
+and provide an interface to the Application module.
+Inputs:
+1. Datasets in numpy or pandas formats.
+2. The name of the OD algorithm.
+
+Outputs:
+1. The visualization of outlier detection or
+2. Error messages.
 """
 from sklearn.manifold import TSNE
 from dataclasses import dataclass
@@ -52,7 +52,7 @@ from typing import Dict
 VERBOSE = 999
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("[OutlierDetect]")
-PROJ_DIR = P(__file__).parent
+PROJ_DIR = P(__file__).parent.parent
 TMP_DIR = ensure_dir(PROJ_DIR.joinpath("tmp"))
 CACHE_DIR = ensure_dir(PROJ_DIR.joinpath(".cache"))
 MEMORY = Memory(location=CACHE_DIR, verbose=VERBOSE)
@@ -270,6 +270,174 @@ class DetectionResult:
     y_test_pred_confidence = None
 
 
+from pyod.utils.example import *
+
+
+def visualize(
+    clf_name,
+    X_train,
+    y_train,
+    X_test,
+    y_test,
+    y_train_pred,
+    y_test_pred,
+    show_figure=True,
+    save_figure=False,
+):  # pragma: no cover
+    """Utility function for visualizing the results in examples.
+    Internal use only.
+
+    Parameters
+    ----------
+    clf_name : str
+        The name of the detector.
+
+    X_train : numpy array of shape (n_samples, n_features)
+        The training samples.
+
+    y_train : list or array of shape (n_samples,)
+        The ground truth of training samples.
+
+    X_test : numpy array of shape (n_samples, n_features)
+        The test samples.
+
+    y_test : list or array of shape (n_samples,)
+        The ground truth of test samples.
+
+    y_train_pred : numpy array of shape (n_samples, n_features)
+        The predicted binary labels of the training samples.
+
+    y_test_pred : numpy array of shape (n_samples, n_features)
+        The predicted binary labels of the test samples.
+
+    show_figure : bool, optional (default=True)
+        If set to True, show the figure.
+
+    save_figure : bool, optional (default=False)
+        If set to True, save the figure to the local.
+
+    """
+
+    def _add_sub_plot(
+        X_inliers,
+        X_outliers,
+        sub_plot_title,
+        inlier_color="blue",
+        outlier_color="orange",
+    ):
+        """Internal method to add subplot of inliers and outliers.
+
+        Parameters
+        ----------
+        X_inliers : numpy array of shape (n_samples, n_features)
+            Outliers.
+
+        X_outliers : numpy array of shape (n_samples, n_features)
+            Inliers.
+
+        sub_plot_title : str
+            Subplot title.
+
+        inlier_color : str, optional (default='blue')
+            The color of inliers.
+
+        outlier_color : str, optional (default='orange')
+            The color of outliers.
+
+        """
+        plt.axis("equal")
+        plt.scatter(
+            X_inliers[:, 0], X_inliers[:, 1], label="inliers", color=inlier_color, s=20
+        )
+        plt.scatter(
+            X_outliers[:, 0],
+            X_outliers[:, 1],
+            label="outliers",
+            color=outlier_color,
+            s=20,
+            marker="^",
+        )
+        plt.title(sub_plot_title, fontsize=10)
+        plt.xticks([])
+        plt.yticks([])
+        plt.legend(loc=3, prop={"size": 10})
+
+    # check input data shapes are consistent
+    (
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        y_train_pred,
+        y_test_pred,
+    ) = check_consistent_shape(
+        X_train, y_train, X_test, y_test, y_train_pred, y_test_pred
+    )
+
+    if X_train.shape[1] != 2:
+        raise ValueError(
+            "Input data has to be 2-d for visualization. The "
+            "input data has {shape}.".format(shape=X_train.shape)
+        )
+
+    X_train_outliers, X_train_inliers = get_outliers_inliers(X_train, y_train)
+    X_train_outliers_pred, X_train_inliers_pred = get_outliers_inliers(
+        X_train, y_train_pred
+    )
+
+    X_test_outliers, X_test_inliers = get_outliers_inliers(X_test, y_test)
+    X_test_outliers_pred, X_test_inliers_pred = get_outliers_inliers(
+        X_test, y_test_pred
+    )
+
+    # plot ground truth vs. predicted results
+    fig = plt.figure(figsize=(10, 8))
+    # plt.suptitle("Demo of {clf_name} Detector".format(clf_name=clf_name), fontsize=15)
+
+    fig.add_subplot(221)
+    _add_sub_plot(
+        X_train_inliers,
+        X_train_outliers,
+        "Train Set Ground Truth",
+        inlier_color="blue",
+        outlier_color="orange",
+    )
+
+    fig.add_subplot(222)
+    _add_sub_plot(
+        X_train_inliers_pred,
+        X_train_outliers_pred,
+        "Train Set Prediction",
+        inlier_color="blue",
+        outlier_color="orange",
+    )
+
+    fig.add_subplot(223)
+    _add_sub_plot(
+        X_test_inliers,
+        X_test_outliers,
+        "Test Set Ground Truth",
+        inlier_color="green",
+        outlier_color="red",
+    )
+
+    fig.add_subplot(224)
+    _add_sub_plot(
+        X_test_inliers_pred,
+        X_test_outliers_pred,
+        "Test Set Prediction",
+        inlier_color="green",
+        outlier_color="red",
+    )
+    plt.tight_layout()
+
+    if save_figure:
+        plt.savefig("{clf_name}.png".format(clf_name=clf_name), dpi=300)
+
+    if show_figure:
+        plt.show()
+
+
 @dataclass
 class DetectionEvaluator:
     """
@@ -314,18 +482,20 @@ class DetectionEvaluator:
         temp = P.cwd()
         os.chdir(parent)
         clf_name, data, res = self.model.name, self.data, self.result
-        from pyod.utils.example import visualize
-
-        visualize(
-            clf_name=clf_name,
-            show_figure=False,
-            save_figure=True,
-            X_train=data.X_train2d,
-            y_train=data.y_train,
-            X_test=data.X_test2d,
-            y_test=data.y_test,
-            y_train_pred=res.y_train_pred,
-            y_test_pred=res.y_test_pred,
+        # from pyod.utils.example import visualize
+        Parallel(2)(
+            delayed(visualize)(
+                clf_name=clf_name,
+                show_figure=False,
+                save_figure=True,
+                X_train=data.X_train2d,
+                y_train=data.y_train,
+                X_test=data.X_test2d,
+                y_test=data.y_test,
+                y_train_pred=res.y_train_pred,
+                y_test_pred=res.y_test_pred,
+            )
+            for _ in range(1)
         )
         os.chdir(temp)
         image = parent.joinpath(f"{clf_name}.png")

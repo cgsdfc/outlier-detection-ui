@@ -22,5 +22,5 @@
 
 import os
 
-print('编译UI文件。。。')
-os.system('pyuic5.exe -x -o src/UserInterface.py src/UserInterface.ui')
+print('编译资源。。。')
+assert not os.system('pyrcc5 src/res.qrc -o src/res_rc.py')

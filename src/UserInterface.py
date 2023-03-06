@@ -1531,16 +1531,16 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "异常流量数据分析软件"))
-        self.groupBox_2.setTitle(_translate("MainWindow", "输入参数"))
-        self.label_4.setText(_translate("MainWindow", "异常点比例"))
-        self.label_3.setText(_translate("MainWindow", "测试样本数"))
-        self.label.setText(_translate("MainWindow", "选择模型"))
-        self.label_5.setText(_translate("MainWindow", "特征维数"))
-        self.label_2.setText(_translate("MainWindow", "训练样本数"))
-        self.label_6.setText(_translate("MainWindow", "随机种子"))
-        self.groupBox.setTitle(_translate("MainWindow", "检测结果"))
-        self.pbRunDetect.setText(_translate("MainWindow", "检测"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Outlier Detection Demonstration"))
+        self.groupBox_2.setTitle(_translate("MainWindow", "Parameters"))
+        self.label_4.setText(_translate("MainWindow", "Ratio of Outliers"))
+        self.label_3.setText(_translate("MainWindow", "#Testing Set"))
+        self.label.setText(_translate("MainWindow", "Select a Model"))
+        self.label_5.setText(_translate("MainWindow", "Feature Dims"))
+        self.label_2.setText(_translate("MainWindow", "#Training Set"))
+        self.label_6.setText(_translate("MainWindow", "Random Seed"))
+        self.groupBox.setTitle(_translate("MainWindow", "Detection Results"))
+        self.pbRunDetect.setText(_translate("MainWindow", "Run"))
 
 
 import src.res_rc as res_rc
