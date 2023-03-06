@@ -1,17 +1,17 @@
 # MIT License
-# 
+#
 # Copyright (c) 2022 Cong Feng
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -13408,7 +13408,7 @@ qt_resource_struct_v2 = b"\
 \x00\x00\x01\x83\x1f\xdb\x46\xd6\
 "
 
-qt_version = [int(v) for v in QtCore.qVersion().split('.')]
+qt_version = [int(v) for v in QtCore.qVersion().split(".")]
 if qt_version < [5, 8, 0]:
     rcc_version = 1
     qt_resource_struct = qt_resource_struct_v1
@@ -13416,10 +13416,17 @@ else:
     rcc_version = 2
     qt_resource_struct = qt_resource_struct_v2
 
+
 def qInitResources():
-    QtCore.qRegisterResourceData(rcc_version, qt_resource_struct, qt_resource_name, qt_resource_data)
+    QtCore.qRegisterResourceData(
+        rcc_version, qt_resource_struct, qt_resource_name, qt_resource_data
+    )
+
 
 def qCleanupResources():
-    QtCore.qUnregisterResourceData(rcc_version, qt_resource_struct, qt_resource_name, qt_resource_data)
+    QtCore.qUnregisterResourceData(
+        rcc_version, qt_resource_struct, qt_resource_name, qt_resource_data
+    )
+
 
 qInitResources()

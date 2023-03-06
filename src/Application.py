@@ -1,17 +1,17 @@
 # MIT License
-# 
+#
 # Copyright (c) 2022 Cong Feng
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -47,7 +47,6 @@ LOG = logging.getLogger("[Application]")
 
 
 class MyWindow(QtWidgets.QMainWindow):
-
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
@@ -57,14 +56,15 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.leNumTrain.setValidator(QIntValidator(1, 10000, self))
         self.ui.leNumTest.setValidator(QIntValidator(1, 5000, self))
         self.ui.leOutlierRate.setValidator(QDoubleValidator(0.1, 0.5, 2, self))
-        self.ui.lbProgress.setText('就绪')
+        self.ui.lbProgress.setText("就绪")
         self.ui.lbImage.setScaledContents(True)
         self.data_config = DataConfig()
         self.model_config = ModelConfig()
         self.ui.cbModelName.addItems(MODEL_ZOO.model_list)
-        self.ui.cbModelName.setCurrentText('KNN')
+        self.ui.cbModelName.setCurrentText("KNN")
 
         from src.NAME import NAME
+
         self.ui.centralwidget.setWindowTitle(NAME)
 
         self.ui.leNumTrain.setText(str(self.data_config.n_train))
@@ -76,13 +76,13 @@ class MyWindow(QtWidgets.QMainWindow):
 
     @pyqtSlot(str)
     def on_cbModelName_currentTextChanged(self, value: str):
-        LOG.info(f'cbModelName: {value}')
+        LOG.info(f"cbModelName: {value}")
         self.model_config.name = value
 
     @pyqtSlot()
     def on_leSeed_editingFinished(self):
         value = self.ui.leSeed.text()
-        LOG.info(f'leSeed: {value}')
+        LOG.info(f"leSeed: {value}")
         try:
             self.data_config.seed = int(value)
         except ValueError:
@@ -91,7 +91,7 @@ class MyWindow(QtWidgets.QMainWindow):
     @pyqtSlot()
     def on_leNumTrain_editingFinished(self):
         value = self.ui.leNumTrain.text()
-        LOG.info(f'leNumTrain: {value}')
+        LOG.info(f"leNumTrain: {value}")
         try:
             self.data_config.n_train = int(value)
         except ValueError:
@@ -100,7 +100,7 @@ class MyWindow(QtWidgets.QMainWindow):
     @pyqtSlot()
     def on_leNumTest_editingFinished(self):
         value = self.ui.leNumTest.text()
-        LOG.info(f'leNumTest: {value}')
+        LOG.info(f"leNumTest: {value}")
         try:
             self.data_config.n_test = int(value)
         except ValueError:
@@ -109,7 +109,7 @@ class MyWindow(QtWidgets.QMainWindow):
     @pyqtSlot()
     def on_leOutlierRate_editingFinished(self):
         value = self.ui.leOutlierRate.text()
-        LOG.info(f'leOutlierRate: {value}')
+        LOG.info(f"leOutlierRate: {value}")
         try:
             self.data_config.contamination = float(value)
         except ValueError:
@@ -118,7 +118,7 @@ class MyWindow(QtWidgets.QMainWindow):
     @pyqtSlot()
     def on_leNumFeas_editingFinished(self):
         value = self.ui.leNumFeas.text()
-        LOG.info(f'leNumFeas: {value}')
+        LOG.info(f"leNumFeas: {value}")
         try:
             self.data_config.n_features = int(value)
         except ValueError:
@@ -126,17 +126,21 @@ class MyWindow(QtWidgets.QMainWindow):
 
     @pyqtSlot()
     def on_pbRunDetect_clicked(self):
-        LOG.info(f'pbRunDetect clicked')
+        LOG.info(f"pbRunDetect clicked")
         if self.job is not None:
-            QMessageBox.warning(self, '警告', '检测进行中，请等待',
-                                QMessageBox.StandardButton.Yes,
-                                QMessageBox.StandardButton.Yes)
+            QMessageBox.warning(
+                self,
+                "警告",
+                "检测进行中，请等待",
+                QMessageBox.StandardButton.Yes,
+                QMessageBox.StandardButton.Yes,
+            )
             return
 
         pgb = self.ui.pgbEvaluator
         pgb.reset()
         pgb.setRange(0, len(RunEvaluator.ACTION_LIST) - 1)
-        self.ui.lbProgress.setText('检测中')
+        self.ui.lbProgress.setText("检测中")
         self.job = RunEvaluator(
             parent=self,
             data_config=self.data_config,
@@ -146,10 +150,10 @@ class MyWindow(QtWidgets.QMainWindow):
         self.job.start()
 
     ACTION_TO_PROGRESS = dict(
-        load_data='数据加载完成',
-        load_model='模型加载完成',
-        detect='检测完成',
-        visualize='可视化完成',
+        load_data="数据加载完成",
+        load_model="模型加载完成",
+        detect="检测完成",
+        visualize="可视化完成",
     )
 
     def reset_job(self):
@@ -161,28 +165,31 @@ class MyWindow(QtWidgets.QMainWindow):
         self.job = None
 
     def build_slot_dict(self):
-
         def on_visualize(tag: str, image: str):
             on_progress(tag)
             label = self.ui.lbImage
             image = QtGui.QPixmap(image).scaled(label.width(), label.height())
             assert not image.isNull()
             label.setPixmap(image)
-            LOG.info(f'Label on {image}, tag {tag}')
+            LOG.info(f"Label on {image}, tag {tag}")
             self.reset_job()
 
         def on_error(tag: str, msg: str):
-            LOG.info(f'Error {msg}, tag {tag}')
-            QMessageBox.warning(self, '错误', msg,
-                                QMessageBox.StandardButton.Yes,
-                                QMessageBox.StandardButton.Yes)
+            LOG.info(f"Error {msg}, tag {tag}")
+            QMessageBox.warning(
+                self,
+                "错误",
+                msg,
+                QMessageBox.StandardButton.Yes,
+                QMessageBox.StandardButton.Yes,
+            )
             self.reset_job()
 
         def on_progress(tag: str):
             assert tag in self.ACTION_TO_PROGRESS
             text = self.ACTION_TO_PROGRESS[tag]
             self.ui.lbProgress.setText(text)
-            LOG.info(f'Progress {tag} => {text}')
+            LOG.info(f"Progress {tag} => {text}")
             pgb = self.ui.pgbEvaluator
             val_pgb = RunEvaluator.ACTION_LIST.index(tag)
             assert val_pgb != -1
@@ -202,10 +209,10 @@ class RunEvaluator(QThread):
 
     # error not in here!!
     ACTION_LIST = [
-        'load_data',
-        'load_model',
-        'detect',
-        'visualize',
+        "load_data",
+        "load_model",
+        "detect",
+        "visualize",
     ]
 
     def __init__(
@@ -221,16 +228,16 @@ class RunEvaluator(QThread):
         self.evaluator = DetectionEvaluator()
         for key, slot in slot_dict.items():
             try:
-                sig = getattr(self, f'sig_{key}')
+                sig = getattr(self, f"sig_{key}")
             except AttributeError:
                 continue
             sig.connect(slot)
 
     def get_args(self, key):
-        if key == 'load_data':
-            return (self.data_config, )
-        if key == 'load_model':
-            return (self.model_config, )
+        if key == "load_data":
+            return (self.data_config,)
+        if key == "load_model":
+            return (self.model_config,)
         return tuple()
 
     def run(self) -> None:
@@ -240,13 +247,13 @@ class RunEvaluator(QThread):
             try:
                 ret = action(*args)
             except Exception as e:
-                self.sig_error.emit('error', str(e))
+                self.sig_error.emit("error", str(e))
                 traceback.print_exc()
-                LOG.warning(f'Error in action {key}')
+                LOG.warning(f"Error in action {key}")
                 return
             else:
-                sig = getattr(self, f'sig_{key}')
-                if key == 'visualize':
+                sig = getattr(self, f"sig_{key}")
+                if key == "visualize":
                     sig.emit(key, str(ret))
                 else:
                     sig.emit(key)

@@ -1,17 +1,17 @@
 # MIT License
-# 
+#
 # Copyright (c) 2022 Cong Feng
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -54,15 +54,16 @@ logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("[OutlierDetect]")
 PROJ_DIR = P(__file__).parent
 TMP_DIR = ensure_dir(PROJ_DIR.joinpath("tmp"))
-CACHE_DIR = ensure_dir(PROJ_DIR.joinpath('.cache'))
+CACHE_DIR = ensure_dir(PROJ_DIR.joinpath(".cache"))
 MEMORY = Memory(location=CACHE_DIR, verbose=VERBOSE)
 NUM_JOBS = 1
 
-EAGER = os.getenv('ODQT_EAGER', '')
+EAGER = os.getenv("ODQT_EAGER", "")
 if EAGER:
-    LOG.info('EAGER loading pyod modules...')
+    LOG.info("EAGER loading pyod modules...")
     import src.PYODLIBS as PYODLIBS
-    LOG.info('Done')
+
+    LOG.info("Done")
 else:
     PYODLIBS = None
 
@@ -83,8 +84,7 @@ class DataConfig:
     def contamination_percent(self):
         return int(100 * self.contamination)
 
-    def load_data(self) -> 'Data':
-
+    def load_data(self) -> "Data":
         @MEMORY.cache
         def _load_data(self: DataConfig):
             from pyod.utils.data import generate_data
@@ -98,10 +98,11 @@ class DataConfig:
                 n_features=self.n_features,
                 random_state=self.seed,
             )
-            LOG.info(f'Begin TSNE')
+            LOG.info(f"Begin TSNE")
             d.X_train2d, d.X_test2d = Parallel(1)(
-                delayed(tsne)(X) for X in [d.X_train, d.X_test])
-            LOG.info('End TSNE')
+                delayed(tsne)(X) for X in [d.X_train, d.X_test]
+            )
+            LOG.info("End TSNE")
 
             return d
 
@@ -110,10 +111,9 @@ class DataConfig:
 
 @dataclass
 class ModelConfig:
-    name: str = 'KNN'
+    name: str = "KNN"
 
     def load_model(self, contamination: float):
-
         @MEMORY.cache
         def _load_model(self: ModelConfig, contamination: float):
             cls = MODEL_ZOO.load(self.name)
@@ -132,8 +132,7 @@ class Model:
     def name(self):
         return self.model_config.name
 
-    def detect(self, data: 'Data'):
-
+    def detect(self, data: "Data"):
         @MEMORY.cache
         def _detect(self: Model, data: Data):
             self.model.fit(data.X_train, data.y_train)
@@ -141,7 +140,8 @@ class Model:
             res.y_train_pred = self.model.labels_
             res.y_train_scores = self.model.decision_scores_
             res.y_test_pred, res.y_test_pred_confidence = self.model.predict(
-                data.X_test, return_confidence=True)
+                data.X_test, return_confidence=True
+            )
             return res
 
         return _detect(self, data)
@@ -230,7 +230,7 @@ class ModelZoo:
         return self.display2real.get(dis, dis)
 
 
-MODEL_ZOO = ModelZoo(AutoEncoder='MVC')
+MODEL_ZOO = ModelZoo(AutoEncoder="MVC")
 
 
 @dataclass
@@ -259,6 +259,7 @@ class DetectionResult:
     """
     检测结果。基于它可以进行各种可视化和展示。
     """
+
     # get the prediction labels and outlier scores of the training data
     y_train_pred = None  # binary labels (0: inliers, 1: outliers)
     y_train_scores = None  # raw outlier scores
@@ -309,10 +310,12 @@ class DetectionEvaluator:
         parent = ensure_dir(parent.absolute())
 
         import os
+
         temp = P.cwd()
         os.chdir(parent)
         clf_name, data, res = self.model.name, self.data, self.result
         from pyod.utils.example import visualize
+
         visualize(
             clf_name=clf_name,
             show_figure=False,
@@ -325,11 +328,10 @@ class DetectionEvaluator:
             y_test_pred=res.y_test_pred,
         )
         os.chdir(temp)
-        image = parent.joinpath(f'{clf_name}.png')
+        image = parent.joinpath(f"{clf_name}.png")
         return image
 
 
 if __name__ == "__main__":
     ev = DetectionEvaluator()
-    ev.load_data(DataConfig()).load_model(
-        ModelConfig()).detect().visualize(TMP_DIR)
+    ev.load_data(DataConfig()).load_model(ModelConfig()).detect().visualize(TMP_DIR)
