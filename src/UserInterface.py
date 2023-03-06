@@ -1513,7 +1513,7 @@ class Ui_MainWindow(object):
         self.label_6.setText(_translate("MainWindow", "随机种子"))
         self.groupBox.setTitle(_translate("MainWindow", "检测结果"))
         self.pbRunDetect.setText(_translate("MainWindow", "检测"))
-import res_rc
+import src.res_rc as res_rc
 
 
 if __name__ == "__main__":

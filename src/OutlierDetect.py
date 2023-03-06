@@ -61,7 +61,7 @@ NUM_JOBS = 1
 EAGER = os.getenv('ODQT_EAGER', '')
 if EAGER:
     LOG.info('EAGER loading pyod modules...')
-    import PYODLIBS
+    import src.PYODLIBS as PYODLIBS
     LOG.info('Done')
 else:
     PYODLIBS = None

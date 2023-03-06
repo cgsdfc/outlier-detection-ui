@@ -26,7 +26,7 @@
 
 import traceback
 from typing import Callable, Dict
-from UserInterface import *
+from src.UserInterface import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
 from PyQt5.QtWidgets import (
@@ -39,7 +39,7 @@ from PyQt5.QtWidgets import (
     QCheckBox,
 )
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from OutlierDetect import MODEL_ZOO, DataConfig, DetectionEvaluator, ModelConfig
+from src.OutlierDetect import MODEL_ZOO, DataConfig, DetectionEvaluator, ModelConfig
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -64,7 +64,7 @@ class MyWindow(QtWidgets.QMainWindow):
         self.ui.cbModelName.addItems(MODEL_ZOO.model_list)
         self.ui.cbModelName.setCurrentText('KNN')
 
-        from NAME import NAME
+        from src.NAME import NAME
         self.ui.centralwidget.setWindowTitle(NAME)
 
         self.ui.leNumTrain.setText(str(self.data_config.n_train))

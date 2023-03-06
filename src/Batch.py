@@ -25,7 +25,7 @@
 """
 
 from pathlib import Path as P
-from OutlierDetect import *
+from src.OutlierDetect import *
 
 OUTPUT_DIR = ensure_dir(PROJ_DIR.joinpath('output'))
 

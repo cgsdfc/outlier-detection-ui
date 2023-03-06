@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from Application import MyWindow, QtWidgets
+from src.Application import MyWindow, QtWidgets
 
 if __name__ == "__main__":
     import sys

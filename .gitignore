@@ -9,3 +9,4 @@ __pycache__/
 /tmp/
 /.cache/
 /output/
+.DS_Store
