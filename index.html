@@ -17,7 +17,7 @@
 
         <div id="parameters" class="frame">
             <div class="param">
-                <label for="select-model">Select a Model:</label>
+                <label for="select-model">Select a Model</label>
                 <select name="select-model" id="select-model">
                     <option value="model-1">Model 1</option>
                     <option value="model-2">Model 2</option>
@@ -26,25 +26,25 @@
                 </select>
             </div>
             <div class="param">
-                <label for="training-set">#Training Set:</label>
+                <label for="training-set">#Training Set</label>
                 <input type="number" id="training-set" name="training-set" value="1000">
             </div>
 
             <div class="param">
-                <label for="testing-set">#Testing Set:</label>
+                <label for="testing-set">#Testing Set</label>
                 <input type="number" id="testing-set" name="testing-set" value="100">
             </div>
 
             <div class="param">
-                <label for="outlier-ratio">Outliers%:</label>
+                <label for="outlier-ratio">Outliers%</label>
                 <input type="number" id="outlier-ratio" name="outlier-ratio" step=".01" min="0" max="1" value=".1">
             </div>
             <div class="param">
-                <label for="feature-dims">Feature Dims:</label>
+                <label for="feature-dims">Feature Dims</label>
                 <input type="number" id="feature-dims" name="feature-dims" value="10">
             </div>
             <div class="param">
-                <label for="random-seed">Random Seed:</label>
+                <label for="random-seed">Random Seed</label>
                 <input type="number" id="random-seed" name="random-seed" value="42">
             </div>
         </div>
@@ -55,11 +55,11 @@
         </div>
 
         <div id="status-bar" class="frame">
-            <span class="status-label">Ready</span>
+            <span id="status-label" class="frame">Ready</span>
             <div class="progress-bar">
                 <div class="progress"></div>
             </div>
-            <button id="run-btn">RUN</button>
+            <button id="run-btn" class="frame">RUN</button>
         </div>
 
     </div>
