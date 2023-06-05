@@ -31,7 +31,7 @@ def parse_params():
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("./index.html")
 
 
 @app.route("/run", methods=["GET"])
@@ -57,10 +57,9 @@ def run():
 
     logging.info("Visualize begins")
     image = ev.visualize()
-    image = base64.b64encode(image.read_bytes())
-    logging.info(f"Base64 {image}")
+    image = base64.b64encode(image.read_bytes()).decode()
 
-    return make_response(image)
+    return make_response(dict(image=image))
 
 
 if __name__ == "__main__":

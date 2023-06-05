@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Outliers Detection Demo</title>
     <!-- Add any necessary CSS or JavaScript files here -->
     <link rel="stylesheet" type="text/css" href="index.css">
@@ -19,9 +21,14 @@
             <div class="param">
                 <label for="select-model">Select a Model</label>
                 <select name="select-model" id="select-model">
-                    <option value="model-1">Model 1</option>
-                    <option value="model-2">Model 2</option>
-                    <option value="model-3">Model 3</option>
+                    <option value="ABOD">ABOD</option>
+                    <option value="HBOS">HBOS</option>
+                    <option value="IForest">IForest</option>
+                    <option value="KNN">KNN</option>
+                    <option value="LOF">LOF</option>
+                    <option value="MCD">MCD</option>
+                    <option value="OCSVM">OCSVM</option>
+                    <option value="PCA">PCA</option>
                     <!-- Add more options as needed -->
                 </select>
             </div>
@@ -51,7 +58,7 @@
 
         <div id="image-canvas" class="frame">
             <!-- Add JavaScript to dynamically generate the image and display it in this canvas -->
-            <img src="./src/splash.png" />
+            <img src="./src/splash.png" alt="Detection Result"/>
         </div>
 
         <div id="status-bar" class="frame">

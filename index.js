@@ -1,3 +1,12 @@
+const PARAMS = [
+    'select_model',
+    'training_set',
+    'testing_set',
+    'outlier_ratio',
+    'feature_dims',
+    'random_seed',
+];
+
 function Parameters() {
     this.select_model = document.getElementById("select-model").value;
     this.training_set = document.getElementById("training-set").value;
@@ -7,12 +16,12 @@ function Parameters() {
     this.random_seed = document.getElementById("random-seed").value;
 
     console.log('Load parameters');
-    for (let key in this) {
+    for (let key of PARAMS) {
         console.log(`${key} => ${this[key]}`);
     }
     this.as_url = function () {
         var out = [];
-        for (let key in this) {
+        for (let key of PARAMS) {
             out.push(`${key}=${this[key]}`);
         }
         return out.join('&');
@@ -25,7 +34,7 @@ function updateParams() {
     parameters = new Parameters();
 }
 
-window.onload(() => { updateParams(); });
+window.onload = () => { updateParams(); };
 
 const URL = 'http://127.0.0.1:5000';
 
@@ -38,7 +47,7 @@ function run() {
             var imgdata = data['image'];
             imgdata = `data:image/png;base64,${imgdata}`;
             const canvas = document.getElementById("image-canvas");
-            canvas.innerHTML = `<img src=${imgdata}/>`;
+            canvas.innerHTML = `<img src=${imgdata} alt="Detection Result"/>`;
             console.log(`Get run ${data}`);
         });
 }
