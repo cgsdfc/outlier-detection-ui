@@ -5,3 +5,5 @@ pyqtgraph
 pyod
 tensorflow
 pyinstaller
+flask
+flask-cors
