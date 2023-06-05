@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Outliers Detection Demo</title>
+    <!-- Add any necessary CSS or JavaScript files here -->
+    <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+
+<body>
+    <div id="app" class="frame">
+
+        <!-- <div id="heading" class="frame">
+            <h1>Outliers Detection Demo</h1>
+        </div> -->
+
+        <div id="parameters" class="frame">
+            <div class="param">
+                <label for="select-model">Select a Model:</label>
+                <select name="select-model" id="select-model">
+                    <option value="model-1">Model 1</option>
+                    <option value="model-2">Model 2</option>
+                    <option value="model-3">Model 3</option>
+                    <!-- Add more options as needed -->
+                </select>
+            </div>
+            <div class="param">
+                <label for="training-set">#Training Set:</label>
+                <input type="number" id="training-set" name="training-set" value="1000">
+            </div>
+
+            <div class="param">
+                <label for="testing-set">#Testing Set:</label>
+                <input type="number" id="testing-set" name="testing-set" value="100">
+            </div>
+
+            <div class="param">
+                <label for="outlier-ratio">Ratio of Outliers:</label>
+                <input type="number" id="outlier-ratio" name="outlier-ratio" step=".01" min="0" max="1" value=".1">
+            </div>
+            <div class="param">
+                <label for="feature-dims">Feature Dims:</label>
+                <input type="number" id="feature-dims" name="feature-dims" value="10">
+            </div>
+            <div class="param">
+                <label for="random-seed">Random Seed:</label>
+                <input type="number" id="random-seed" name="random-seed" value="42">
+            </div>
+        </div>
+
+        <div id="image-canvas" class="frame">
+            <!-- Add JavaScript to dynamically generate the image and display it in this canvas -->
+            <img src="./src/splash.png" />
+        </div>
+
+        <div id="status-bar" class="frame">
+            <span class="status-label">Ready</span>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <button id="run-btn">RUN</button>
+        </div>
+
+    </div>
+
+    <!-- Add any necessary JavaScript code here -->
+    <script src="index.js"></script>
+</body>
+
+</html>
