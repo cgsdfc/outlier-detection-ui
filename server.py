@@ -48,7 +48,7 @@ def load_data():
     )
     logging.info("Load data begins")
     ev.load_data(config=cfg)
-    time.sleep(2)
+    time.sleep(1)
     return dict(status='Data Loaded', step=1)
 
 
@@ -58,7 +58,7 @@ def load_model():
     logging.info("Load model begins")
     cfg = ModelConfig(name=params["select_model"])
     ev.load_model(config=cfg)
-    time.sleep(2)
+    time.sleep(1)
     return dict(status='Model Loaded', step=2)
 
 
@@ -66,7 +66,7 @@ def load_model():
 def detect():
     logging.info("Detect begins")
     ev.detect()
-    time.sleep(2)
+    time.sleep(1)
     return dict(status='Detected', step=3)
 
 
@@ -76,7 +76,7 @@ def visualize():
     image = ev.visualize()
     image = base64.b64encode(image.read_bytes()).decode()
 
-    time.sleep(2)
+    time.sleep(1)
     return dict(status='Done', step=4, image=image)
 
 

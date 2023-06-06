@@ -41,23 +41,25 @@ const URL = 'http://127.0.0.1:5000';
 function run() {
     updateParams();
     const param_str = parameters.as_url();
-    var pgb = document.querySelector('.progress-bar');
+    var pgb = document.getElementById('progress-bar');
     var status = document.getElementById("status-label");
     status.innerHTML = 'Ready';
-    pgb.style.width = '0%';
+    pgb.value = 0;
+    // document.getElementById("image-canvas").innerHTML = '<img src="./static/img/splash.png" alt="Detection Result"/>';
+
     fetch(`${URL}/load_data?${param_str}`)
         .then(() => {
-            pgb.style.width = '25%';
+            pgb.value = 25;
             status.innerHTML = 'Data Loaded';
             return fetch(`${URL}/load_model?${param_str}`);
         })
         .then(() => {
-            pgb.style.width = '50%';
+            pgb.value = 50;
             status.innerHTML = 'Model Loaded';
             return fetch(`${URL}/detect?${param_str}`);
         })
         .then(() => {
-            pgb.style.width = '75%';
+            pgb.value = 75;
             status.innerHTML = 'Detected';
             return fetch(`${URL}/visualize?${param_str}`);
         })
@@ -67,7 +69,7 @@ function run() {
             imgdata = `data:image/png;base64,${imgdata}`;
             const canvas = document.getElementById("image-canvas");
             canvas.innerHTML = `<img src=${imgdata} alt="Detection Result"/>`;
-            pgb.style.width = '100%';
+            pgb.value = 100;
             status.innerHTML = 'Done';
         });
 }
