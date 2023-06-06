@@ -3,6 +3,7 @@ from flask_cors import CORS
 from src.OutlierDetect import DetectionEvaluator, DataConfig, ModelConfig
 import logging
 import base64
+import time
 
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
@@ -18,6 +19,7 @@ PARAMS = dict(
 )
 
 logging.info(PARAMS)
+ev = DetectionEvaluator()
 
 
 def parse_params():
@@ -34,10 +36,9 @@ def index():
     return render_template("./index.html")
 
 
-@app.route("/run", methods=["GET"])
-def run():
+@app.route("/load_data", methods=["GET"])
+def load_data():
     params = parse_params()
-    ev = DetectionEvaluator()
     cfg = DataConfig(
         n_train=params["training_set"],
         n_test=params["testing_set"],
@@ -47,19 +48,36 @@ def run():
     )
     logging.info("Load data begins")
     ev.load_data(config=cfg)
+    time.sleep(2)
+    return dict(status='Data Loaded', step=1)
 
+
+@app.route("/load_model", methods=["GET"])
+def load_model():
+    params = parse_params()
     logging.info("Load model begins")
     cfg = ModelConfig(name=params["select_model"])
     ev.load_model(config=cfg)
+    time.sleep(2)
+    return dict(status='Model Loaded', step=2)
 
+
+@app.route("/detect", methods=["GET"])
+def detect():
     logging.info("Detect begins")
     ev.detect()
+    time.sleep(2)
+    return dict(status='Detected', step=3)
 
+
+@app.route("/visualize", methods=["GET"])
+def visualize():
     logging.info("Visualize begins")
     image = ev.visualize()
     image = base64.b64encode(image.read_bytes()).decode()
 
-    return make_response(dict(image=image))
+    time.sleep(2)
+    return dict(status='Done', step=4, image=image)
 
 
 if __name__ == "__main__":
