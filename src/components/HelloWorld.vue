@@ -5,15 +5,7 @@
       <div class="param">
         <label for="select-model">Select a Model</label>
         <select v-model="select_model" id="select-model">
-          <option value="ABOD">ABOD</option>
-          <option value="HBOS">HBOS</option>
-          <option value="IForest">IForest</option>
-          <option value="KNN">KNN</option>
-          <option value="LOF">LOF</option>
-          <option value="MCD">MCD</option>
-          <option value="OCSVM">OCSVM</option>
-          <option value="PCA">PCA</option>
-          <!-- Add more options as needed -->
+          <option v-for="m in methods" :key="m" :value="m" :label="m"></option>
         </select>
       </div>
       <div class="param">
@@ -81,6 +73,16 @@ export default {
       pgb: 0,
       result_image: null,
       default_image: require('@/assets/splash.png'),
+      methods: [
+        "ABOD",
+        "HBOS",
+        "IForest",
+        "KNN",
+        "LOF",
+        "MCD",
+        "OCSVM",
+        "PCA",
+      ]
     }
   },
   methods: {
