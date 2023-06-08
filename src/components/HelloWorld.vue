@@ -65,7 +65,7 @@ export const PARAMS = [
   'feature_dims',
   'random_seed',
 ];
-export const URL = 'http://127.0.0.1:5000';
+export const URL = '/api';
 
 export default {
   name: 'HelloWorld',
@@ -97,6 +97,7 @@ export default {
     run() {
       const param_str = this.get_params();
       this.pgb = 0;
+      this.status = 'Ready';
 
       fetch(`${URL}/load_data?${param_str}`)
         .then(() => {
