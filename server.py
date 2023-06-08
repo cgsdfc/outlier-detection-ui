@@ -18,16 +18,19 @@ PARAMS = dict(
     random_seed=int,
 )
 
-logging.info(PARAMS)
 ev = DetectionEvaluator()
 
 
 def parse_params():
+    from pprint import pprint
+
     out = {}
     for name, type in PARAMS.items():
         val = request.args[name]
         val = type(val)
         out[name] = val
+        
+    pprint(out)
     return out
 
 

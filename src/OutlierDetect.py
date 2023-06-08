@@ -49,7 +49,7 @@ def ensure_dir(dir: P):
 
 from typing import Dict
 
-VERBOSE = 999
+VERBOSE = 0
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("[OutlierDetect]")
 PROJ_DIR = P(__file__).parent.parent

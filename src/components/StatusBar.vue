@@ -11,15 +11,17 @@ export const URL = '/api';
 
 export default {
     name: 'StatusBar',
+    props: ['params_str'],
     data() {
         return {
             pgb: 0,
             status: 'Ready',
+            result_image: '',
         }
     },
     methods: {
         run() {
-            const param_str = this.get_params();
+            const param_str = this.params_str;
             this.pgb = 0;
             this.status = 'Ready';
 
@@ -46,6 +48,7 @@ export default {
                     this.result_image = imgdata;
                     this.pgb = 100;
                     this.status = 'Done';
+                    this.$emit("result-ready", this.result_image);
                 });
         }
     }

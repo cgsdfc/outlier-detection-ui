@@ -9,9 +9,9 @@ import '@/assets/common.css'
 
 export default {
     name: 'ImageCanvas',
+    props: ['result_image'],
     data() {
         return {
-            result_image: null,
             default_image: require('@/assets/splash.png'),
         }
     },

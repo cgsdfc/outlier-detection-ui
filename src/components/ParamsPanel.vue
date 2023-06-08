@@ -2,31 +2,31 @@
     <div id="parameters" class="frame">
         <div class="param">
             <label for="select-model">Select a Model</label>
-            <select v-model="select_model" id="select-model">
+            <select v-model="select_model" id="select-model" @input="sendParams">
                 <option v-for="m in methods" :key="m" :value="m" :label="m"></option>
             </select>
         </div>
         <div class="param">
             <label for="training-set">#Training Set</label>
-            <input type="number" id="training-set" v-model="training_set">
+            <input type="number" id="training-set" v-model="training_set" @input="sendParams">
         </div>
 
         <div class="param">
             <label for="testing-set">#Testing Set</label>
-            <input type="number" id="testing-set" v-model="testing_set">
+            <input type="number" id="testing-set" v-model="testing_set" @input="sendParams">
         </div>
 
         <div class="param">
             <label for="outlier-ratio">Outliers%</label>
-            <input type="number" id="outlier-ratio" v-model="outlier_ratio" step=".01" min="0" max="1">
+            <input type="number" id="outlier-ratio" v-model="outlier_ratio" step=".01" min="0" max="1" @input="sendParams">
         </div>
         <div class="param">
             <label for="feature-dims">Feature Dims</label>
-            <input type="number" id="feature-dims" v-model="feature_dims">
+            <input type="number" id="feature-dims" v-model="feature_dims" @input="sendParams">
         </div>
         <div class="param">
             <label for="random-seed">Random Seed</label>
-            <input type="number" id="random-seed" v-model="random_seed">
+            <input type="number" id="random-seed" v-model="random_seed" @input="sendParams">
         </div>
     </div>
 </template>
@@ -65,8 +65,11 @@ export default {
             ]
         }
     },
-    computed: {
-        get_params: function () {
+    methods: {
+        sendParams() {
+            this.$emit('params-changed', this.computeParams())
+        },
+        computeParams() {
             console.log('Load parameters');
             var out = [];
             for (let key of PARAMS) {
@@ -75,6 +78,9 @@ export default {
             }
             return out.join('&');
         },
+    },
+    created() {
+        this.sendParams()
     }
 }
 </script>
