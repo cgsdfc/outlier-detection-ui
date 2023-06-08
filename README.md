@@ -14,8 +14,8 @@ Detection results displayed,
 
 ## Usage
 
-1. Install dependencies in `requirements.txt`.
-2. run `app.py`.
+1. Install with `pip install -r requirements.txt` and `npm install`.
+2. run `server.py` and `npm run serve`.
 3. In the `PARAMETERS` panel, set the parameters.
 4. Press `RUN` to see the results.
 
