@@ -1,5 +1,5 @@
 <template>
-  <HelloWorld/>
+  <HelloWorld />
 </template>
 
 <script>
@@ -21,5 +21,11 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 </style>
