@@ -4,7 +4,7 @@
     <div id="parameters" class="frame">
       <div class="param">
         <label for="select-model">Select a Model</label>
-        <select name="select-model" id="select-model">
+        <select v-model="select_model" id="select-model">
           <option value="ABOD">ABOD</option>
           <option value="HBOS">HBOS</option>
           <option value="IForest">IForest</option>
@@ -18,46 +18,114 @@
       </div>
       <div class="param">
         <label for="training-set">#Training Set</label>
-        <input type="number" id="training-set" name="training-set" value="1000">
+        <input type="number" id="training-set" v-model="training_set">
       </div>
 
       <div class="param">
         <label for="testing-set">#Testing Set</label>
-        <input type="number" id="testing-set" name="testing-set" value="100">
+        <input type="number" id="testing-set" v-model="testing_set">
       </div>
 
       <div class="param">
         <label for="outlier-ratio">Outliers%</label>
-        <input type="number" id="outlier-ratio" name="outlier-ratio" step=".01" min="0" max="1" value=".1">
+        <input type="number" id="outlier-ratio" v-model="outlier_ratio" step=".01" min="0" max="1">
       </div>
       <div class="param">
         <label for="feature-dims">Feature Dims</label>
-        <input type="number" id="feature-dims" name="feature-dims" value="10">
+        <input type="number" id="feature-dims" v-model="feature_dims">
       </div>
       <div class="param">
         <label for="random-seed">Random Seed</label>
-        <input type="number" id="random-seed" name="random-seed" value="42">
+        <input type="number" id="random-seed" v-model="random_seed">
       </div>
     </div>
 
     <div id="image-canvas" class="frame">
       <!-- Add JavaScript to dynamically generate the image and display it in this canvas -->
-      <img src="../assets/splash.png" alt="Detection Result" />
+      <img :src="result_image ? result_image : default_image" alt="Detection Result" />
     </div>
 
     <div id="status-bar" class="frame">
-      <span id="status-label" class="frame">Ready</span>
-      <progress value="0" max="100" id="progress-bar"></progress>
-      <button id="run-btn" class="frame" onclick="run()">RUN</button>
+      <span id="status-label" class="frame">{{ status }}</span>
+      <progress :value="pgb" max="100" id="progress-bar"></progress>
+      <button id="run-btn" class="frame" @click="run()">RUN</button>
     </div>
 
   </div>
 </template>
 
 <script>
+// import '@/assets/splash.png'
+
+export const PARAMS = [
+  'select_model',
+  'training_set',
+  'testing_set',
+  'outlier_ratio',
+  'feature_dims',
+  'random_seed',
+];
+export const URL = 'http://127.0.0.1:5000';
+
 export default {
   name: 'HelloWorld',
+  data() {
+    return {
+      select_model: 'KNN',
+      training_set: 1000,
+      testing_set: 100,
+      outlier_ratio: 0.1,
+      feature_dims: 10,
+      random_seed: 42,
+      status: 'Ready',
+      pgb: 0,
+      result_image: null,
+      default_image: require('@/assets/splash.png'),
+    }
+  },
+  methods: {
+    get_params() {
+      console.log('Load parameters');
+      var out = [];
+      for (let key of PARAMS) {
+        console.log(`${key} => ${this[key]}`);
+        out.push(`${key}=${this[key]}`);
+      }
+      return out.join('&');
+    },
+
+    run() {
+      const param_str = this.get_params();
+      this.pgb = 0;
+
+      fetch(`${URL}/load_data?${param_str}`)
+        .then(() => {
+          this.pgb = 25;
+          this.status = 'Data Loaded';
+          return fetch(`${URL}/load_model?${param_str}`);
+        })
+        .then(() => {
+          this.pgb = 50;
+          this.status = 'Model Loaded';
+          return fetch(`${URL}/detect?${param_str}`);
+        })
+        .then(() => {
+          this.pgb = 75;
+          this.status = 'Detected';
+          return fetch(`${URL}/visualize?${param_str}`);
+        })
+        .then((data) => data.json())
+        .then((data) => {
+          var imgdata = data['image'];
+          imgdata = `data:image/png;base64,${imgdata}`;
+          this.result_image = imgdata;
+          this.pgb = 100;
+          this.status = 'Done';
+        });
+    }
+  }
 }
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
