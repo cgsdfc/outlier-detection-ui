@@ -2,7 +2,7 @@
     <div id="parameters" class="frame">
         <div class="param">
             <label for="select-model">Select a Model</label>
-            <select v-model="select_model" id="select-model" @input="sendParams">
+            <select v-model="select_model" id="select-model" @change="sendParams">
                 <option v-for="m in methods" :key="m" :value="m" :label="m"></option>
             </select>
         </div>
@@ -66,14 +66,15 @@ export default {
         }
     },
     methods: {
-        sendParams() {
+        sendParams(e) {
+            console.log(`sendParams ${e ? e.target.value: 'Nothing'}`)
             this.$emit('params-changed', this.computeParams())
         },
         computeParams() {
-            console.log('Load parameters');
+            // console.log('Load parameters');
             var out = [];
             for (let key of PARAMS) {
-                console.log(`${key} => ${this[key]}`);
+                // console.log(`${key} => ${this[key]}`);
                 out.push(`${key}=${this[key]}`);
             }
             return out.join('&');
