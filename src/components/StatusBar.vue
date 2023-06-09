@@ -2,15 +2,23 @@
     <div id="status-bar" class="frame">
         <span id="status-label" class="frame">{{ status }}</span>
         <progress :value="pgb" max="100" id="progress-bar"></progress>
-        <button id="run-btn" class="frame" @click="run()">RUN</button>
+        <!-- <button id="run-btn" class="frame" @click="run()">RUN</button> -->
+        <el-button id="run-btn" type="primary" @click="run()">RUN</el-button>
     </div>
 </template>
 
 <script>
+
+import { ElButton } from 'element-plus'
+import 'element-plus/es/components/button/style/css'
+
 export const URL = '/api';
 
 export default {
     name: 'StatusBar',
+    components: {
+        ElButton
+    },
     props: ['params_str'],
     data() {
         return {
@@ -92,13 +100,13 @@ progress::-moz-progress-bar {
 }
 
 #run-btn {
-    background-color: #007bff;
+    /* background-color: #007bff;
     color: white;
     padding: 10px 20px;
     border-radius: 3px;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out; */
     max-width: 100px;
     width: 300px;
     height: 40px;
