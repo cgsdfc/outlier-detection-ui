@@ -1,14 +1,14 @@
 <template>
-  <HelloWorld />
+  <OutlierDetectDemo />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import OutlierDetectDemo from './components/OutlierDetectDemo.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    OutlierDetectDemo: OutlierDetectDemo
   }
 }
 </script>
