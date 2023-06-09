@@ -1,7 +1,8 @@
 <template>
     <div id="status-bar" class="frame">
         <span id="status-label" class="frame">{{ status }}</span>
-        <progress :value="pgb" max="100" id="progress-bar"></progress>
+        <!-- <progress :value="pgb" max="100" id="progress-bar"></progress> -->
+        <el-progress :percentage="pgb" color="success" striped></el-progress>
         <!-- <button id="run-btn" class="frame" @click="run()">RUN</button> -->
         <el-button id="run-btn" type="primary" @click="run()">RUN</el-button>
     </div>
@@ -9,16 +10,10 @@
 
 <script>
 
-import { ElButton } from 'element-plus'
-import 'element-plus/es/components/button/style/css'
-
 export const URL = '/api';
 
 export default {
     name: 'StatusBar',
-    components: {
-        ElButton
-    },
     props: ['params_str'],
     data() {
         return {
@@ -81,7 +76,7 @@ export default {
     border-radius: 3px;
     text-align: center;
 }
-
+/*
 progress {
     width: 500px;
     height: 20px;
@@ -97,7 +92,7 @@ progress::-webkit-progress-value {
 progress::-moz-progress-bar {
     background-color: #4caf50;
     border-radius: 10px;
-}
+} */
 
 #run-btn {
     /* background-color: #007bff;
