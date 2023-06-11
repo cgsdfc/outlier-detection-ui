@@ -60,7 +60,7 @@ const PARAMS = [
   'random_seed',
 ];
 
-const URL = '/api';
+const URL = 'http://127.0.0.1:5000';
 
 const METHODS = [
   "ABOD",
@@ -104,21 +104,25 @@ function run() {
   console.log(`params_str ${param_str}`)
   state.pgb = 0;
   state.status = 'Ready';
+  console.log(`RUN!!!`)
 
   fetch(`${URL}/load_data?${param_str}`)
     .then(() => {
       state.pgb = 25;
       state.status = 'Data Loaded';
+      console.log(`${state.status}`)
       return fetch(`${URL}/load_model?${param_str}`);
     })
     .then(() => {
       state.pgb = 50;
       state.status = 'Model Loaded';
+      console.log(`${state.status}`)
       return fetch(`${URL}/detect?${param_str}`);
     })
     .then(() => {
       state.pgb = 75;
       state.status = 'Detected';
+      console.log(`${state.status}`)
       return fetch(`${URL}/visualize?${param_str}`);
     })
     .then((data) => data.json())
@@ -128,6 +132,7 @@ function run() {
       state.result_image = imgdata;
       state.pgb = 100;
       state.status = 'Done';
+      console.log(`${state.status}`)
     });
 }
 
