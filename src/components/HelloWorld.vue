@@ -34,7 +34,7 @@
     <div id="status-bar" class="frame">
       <span id="status-label" class="frame">{{ status }}</span>
       <progress :value="pgb" max="100" id="progress-bar"></progress>
-      <button id="run-btn" class="frame" @click="run()">RUN</button>
+      <el-button type="primary" :loading="0 < pgb && pgb < 100" @click="run()">RUN</el-button>
     </div>
 
   </div>
