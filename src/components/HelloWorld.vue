@@ -2,34 +2,28 @@
   <div id="main-body" class="frame">
 
     <div id="parameters" class="frame">
-      <div class="param">
-        <label for="select-model">Select a Model</label>
-        <select v-model="state.select_model" id="select-model">
-          <option v-for="m in METHODS" :key="m" :value="m" :label="m"></option>
-        </select>
-      </div>
-      <div class="param">
-        <label for="training-set">#Training Set</label>
-        <input type="number" id="training-set" v-model="state.training_set">
-      </div>
-
-      <div class="param">
-        <label for="testing-set">#Testing Set</label>
-        <input type="number" id="testing-set" v-model="state.testing_set">
-      </div>
-
-      <div class="param">
-        <label for="outlier-ratio">Outliers%</label>
-        <input type="number" id="outlier-ratio" v-model="state.outlier_ratio" step=".01" min="0" max="1">
-      </div>
-      <div class="param">
-        <label for="feature-dims">Feature Dims</label>
-        <input type="number" id="feature-dims" v-model="state.feature_dims">
-      </div>
-      <div class="param">
-        <label for="random-seed">Random Seed</label>
-        <input type="number" id="random-seed" v-model="state.random_seed">
-      </div>
+      <el-form inline v-model="state" label-position="top">
+        <el-form-item label="Select a Model">
+          <el-select v-model="state.select_model">
+            <el-option v-for="m in METHODS" :label="m" :value="m"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="#Training Set">
+          <el-input-number v-model="state.training_set"></el-input-number>
+        </el-form-item>
+        <el-form-item label="#Testing Set">
+          <el-input-number v-model="state.testing_set"></el-input-number>
+        </el-form-item>
+        <el-form-item label="Outliers%">
+          <el-input-number precision="2" v-model="state.outlier_ratio"></el-input-number>
+        </el-form-item>
+        <el-form-item label="#Features">
+          <el-input-number v-model="state.feature_dims"></el-input-number>
+        </el-form-item>
+        <el-form-item label="Random Seed">
+          <el-input-number v-model="state.random_seed"></el-input-number>
+        </el-form-item>
+      </el-form>
     </div>
 
     <div id="image-canvas" class="frame">
@@ -264,7 +258,7 @@ progress::-moz-progress-bar {
 
 /* Form styles */
 select,
-input[type="number"] {
+input[] {
   display: inline-block;
 }
 
