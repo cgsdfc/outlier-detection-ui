@@ -34,12 +34,12 @@
 
     <div id="image-canvas" class="frame">
       <!-- Add JavaScript to dynamically generate the image and display it in this canvas -->
-      <img :src="display_image" alt="Detection Result" />
+      <img :src="result_image ? result_image : splash" alt="Detection Result" />
     </div>
 
     <div id="status-bar" class="frame">
-      <span id="status-label" class="frame">{{ state.status }}</span>
-      <progress :value="state.pgb" max="100" id="progress-bar"></progress>
+      <span id="status-label" class="frame">{{ status }}</span>
+      <progress :value="pgb" max="100" id="progress-bar"></progress>
       <button id="run-btn" class="frame" @click="run()">RUN</button>
     </div>
 
@@ -50,6 +50,7 @@
 import splash from '@/assets/splash.png'
 import { computed } from '@vue/reactivity';
 import { reactive } from '@vue/reactivity';
+import { ref } from 'vue';
 
 const PARAMS = [
   'select_model',
@@ -80,14 +81,11 @@ const state = reactive({
   outlier_ratio: 0.1,
   feature_dims: 10,
   random_seed: 42,
-  status: 'Ready',
-  pgb: 0,
-  result_image: null,
-  default_image: splash,
 })
 
-const display_image = computed(() => state.result_image ?
-  state.result_image : state.default_image)
+const status = ref('Ready')
+const pgb = ref(0)
+const result_image = ref('')
 
 function get_params() {
   console.log('Load parameters');
@@ -102,37 +100,39 @@ function get_params() {
 function run() {
   const param_str = get_params();
   console.log(`params_str ${param_str}`)
-  state.pgb = 0;
-  state.status = 'Ready';
+  pgb.value = 0;
+  status.value = 'Ready';
+  // result_image.value = '';
   console.log(`RUN!!!`)
 
   fetch(`${URL}/load_data?${param_str}`)
     .then(() => {
-      state.pgb = 25;
-      state.status = 'Data Loaded';
-      console.log(`${state.status}`)
+      pgb.value = 25;
+      status.value = 'Data Loaded';
+      console.log(`${status.value}`)
       return fetch(`${URL}/load_model?${param_str}`);
     })
     .then(() => {
-      state.pgb = 50;
-      state.status = 'Model Loaded';
-      console.log(`${state.status}`)
+      pgb.value = 50;
+      status.value = 'Model Loaded';
+      console.log(`${status.value}`)
       return fetch(`${URL}/detect?${param_str}`);
     })
     .then(() => {
-      state.pgb = 75;
-      state.status = 'Detected';
-      console.log(`${state.status}`)
+      pgb.value = 75;
+      status.value = 'Detected';
+      console.log(`${status.value}`)
       return fetch(`${URL}/visualize?${param_str}`);
     })
     .then((data) => data.json())
     .then((data) => {
       var imgdata = data['image'];
       imgdata = `data:image/png;base64,${imgdata}`;
-      state.result_image = imgdata;
-      state.pgb = 100;
-      state.status = 'Done';
-      console.log(`${state.status}`)
+      result_image.value = imgdata;
+      pgb.value = 100;
+      status.value = 'Done';
+      console.log(`${status.value}`)
+      console.log(`${result_image ? 1 : 0}`)
     });
 }
 
