@@ -8,7 +8,7 @@
         </div>
         <div class="param">
             <label for="training-set">#Training Set</label>
-            <input type="number" id="training-set" v-model="training_set" @input="sendParams">
+            <el-input v-model="training_set" :step=10 :min=100 @input="sendParams"></el-input>
         </div>
 
         <div class="param">
