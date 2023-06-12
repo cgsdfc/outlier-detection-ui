@@ -15,7 +15,7 @@
           <el-input-number v-model="state.testing_set"></el-input-number>
         </el-form-item>
         <el-form-item label="Outliers%">
-          <el-input-number precision="2" v-model="state.outlier_ratio"></el-input-number>
+          <el-input-number :precision=2 v-model="state.outlier_ratio"></el-input-number>
         </el-form-item>
         <el-form-item label="#Features">
           <el-input-number v-model="state.feature_dims"></el-input-number>
@@ -31,9 +31,10 @@
       <img :src="result_image ? result_image : splash" alt="Detection Result" />
     </div>
 
-    <div id="status-bar" class="frame">
+    <div id="status-bar">
       <span id="status-label" class="frame">{{ status }}</span>
-      <progress :value="pgb" max="100" id="progress-bar"></progress>
+      <el-progress :percentage="pgb" style="width:80%" :stroke-width=30 :striped=true :striped-flow=true :show-text=false
+        :color="green" :stroke-linecap="round"></el-progress>
       <el-button type="primary" :loading="0 < pgb && pgb < 100" @click="run()">RUN</el-button>
     </div>
 
@@ -239,30 +240,15 @@ div img {
   text-align: center;
 }
 
-progress {
+/* progress {
   width: 500px;
   height: 20px;
   border-radius: 10px;
   background-color: #ddd;
-}
+} */
 
-progress::-webkit-progress-value {
-  background-color: #4caf50;
-  border-radius: 10px;
-}
 
-progress::-moz-progress-bar {
-  background-color: #4caf50;
-  border-radius: 10px;
-}
-
-/* Form styles */
-select,
-input[] {
-  display: inline-block;
-}
-
-#run-btn {
+/* #run-btn {
   background-color: #007bff;
   color: white;
   padding: 10px 20px;
@@ -273,5 +259,5 @@ input[] {
   max-width: 100px;
   width: 300px;
   height: 40px;
-}
+} */
 </style>
